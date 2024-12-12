@@ -12,6 +12,7 @@ class Robot:
 
     WHEEL_DIAMETER = 5.6  # centimeters
     WHEEL_BASE = 11.5  # centimeters
+    DEFAULT_WAIT_TIME = 5
 
     def __init__(self, log):
         self.log = log
@@ -36,19 +37,20 @@ class Robot:
         self.left_motor.on_for_degrees(degrees=wheel_degrees, speed=SpeedPercent(speed), brake=True, block=False)
         self.right_motor.on_for_degrees(degrees=-wheel_degrees, speed=SpeedPercent(speed), brake=True, block=True)
 
+    def wait(self):
+        self.sound.beep()
+        self.sound.beep()
+        time.sleep(self.DEFAULT_WAIT_TIME)
+
     def make_square(self, clockwise: bool = True):
         degrees = 90 if clockwise else -90
         for _ in range(4):
             self.move_forward(40)
             self.turn_degrees(degrees)
-        self.sound.beep()
-        logger.info("Recorrido cuadrado completado.")
 
     def bilateral_test(self):
         self.make_square()
-        robot.sound.beep()
-        robot.sound.beep()
-        time.sleep(5)
+        self.wait()
         self.make_square(clockwise=False)
 
 
@@ -57,13 +59,12 @@ if __name__ == '__main__':
     logger.addHandler(logging.FileHandler('sra_grupo4.log'))
     robot = Robot(logger)
 
-    robot.turn_degrees(90)
-    robot.sound.beep()
-    time.sleep(4)
-    robot.turn_degrees(-90)
+    robot.bilateral_test()
 
     # # APARTADO A
     # robot.make_square()
+
+    # robot.wait()
 
     # # APARTADO B
     # for _ in range(10):
@@ -72,6 +73,8 @@ if __name__ == '__main__':
     # # APARTADO C
     # for _ in range(10):
     #     robot.make_square(clockwise=False)
+
+    # robot.wait()
 
     # APARTADO D - Forzar la aparición de error sistemático y comprobar si el test aplica las correcciones adecuadas.
 
