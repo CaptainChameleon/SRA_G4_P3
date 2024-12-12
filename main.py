@@ -11,7 +11,7 @@ from ev3dev2.sound import Sound
 class Robot:
 
     WHEEL_DIAMETER = 5.6  # centimeters
-    WHEEL_BASE = 14.5  # centimeters
+    WHEEL_BASE = 11.5  # centimeters
 
     def __init__(self, log):
         self.log = log
@@ -44,6 +44,13 @@ class Robot:
         self.sound.beep()
         logger.info("Recorrido cuadrado completado.")
 
+    def bilateral_test(self):
+        self.make_square()
+        robot.sound.beep()
+        robot.sound.beep()
+        time.sleep(5)
+        self.make_square(clockwise=False)
+
 
 if __name__ == '__main__':
     logger = logging.getLogger('ev3dev')
@@ -57,13 +64,6 @@ if __name__ == '__main__':
 
     # # APARTADO A
     # robot.make_square()
-    #
-    # # TODO: Remove
-    # robot.sound.beep()
-    # robot.sound.beep()
-    # time.sleep(5)
-    # robot.make_square(clockwise=False)
-    # # TODO: Remove
 
     # # APARTADO B
     # for _ in range(10):
