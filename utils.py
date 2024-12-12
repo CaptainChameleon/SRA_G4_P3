@@ -1,5 +1,6 @@
 import math
 
+
 class Vector:
     def __init__(self, x=0, y=0):
         self.x = x
@@ -29,10 +30,11 @@ class Vector:
         return Vector(new_x, new_y)
 
     def __repr__(self):
-        return f"Vector({self.x}, {self.y})"
+        return "Vector({}, {})".format(self.x, self.y)
 
 
-vector1 = Vector(0, 1)
-rotated_vector = vector1.rotate(90)
-print("Vector original:", vector1)
-print("Vector rotado:", rotated_vector)
+if __name__ == "__main__":
+    vector1 = Vector(0, 1)
+    rotated_vector = vector1.rotate(90)
+    print("Vector original:", vector1)
+    print("Vector rotado:", rotated_vector)
