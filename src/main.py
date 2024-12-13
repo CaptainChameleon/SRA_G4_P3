@@ -75,7 +75,7 @@ class Robot:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="sra_grupo4.log",
+    logging.basicConfig(filename="/home/robot/SRA_G4_P3/sra_grupo4.log",
                         filemode='w+',
                         format='%(asctime)s,%(msecs)d %(message)s',
                         datefmt='%H:%M:%S',
