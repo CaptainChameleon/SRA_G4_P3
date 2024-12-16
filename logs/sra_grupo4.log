@@ -1,160 +1,96 @@
-06:36:12,490 - Moving forward 20cm -
-06:36:12,507 Motor L pos: 20
-06:36:12,521 Motor R pos: -13
-06:36:14,542 Motor L pos: 432
-06:36:14,554 Motor R pos: 399
-06:36:14,582 Updated Position: Vector(20.166130720724286, -2.934106485371858)
-06:36:14,592 Updated Orientation: 6.13870240 radians
-06:36:14,603 Look-at Vector: Vector(0.98958048938559, -0.1439807453355352)
-06:36:14,614 
+11:32:05,111 ** Moving forward 40cm **
+11:32:05,124 Target Tachos: 818.5111359011761
+11:32:09,131 Updating odometry
+11:32:09,151 Motor L pos after movement: 813
+11:32:09,162 Motor R pos after movement: 824
+11:32:09,178 Motor L pos after reset: 0
+11:32:09,190 Motor R pos after reset: -2
+11:32:09,203 Updated Position: Vector(39.985715260584364, -2.238506579757599)
+11:32:09,214 Updated Orientation: 1.62672061 radians
+11:32:09,226 Look-at Vector: Vector(0.9984366448371537, -0.05589513615984286)
+11:32:09,236 
 
-06:36:14,625 - Rotating 90deg -
-06:36:14,636 Motor L pos: -3
-06:36:14,648 Motor R pos: 1
-06:36:15,623 Motor L pos: 186
-06:36:15,634 Motor R pos: -188
-06:36:15,652 Updated Position: Vector(20.173240334104566, -2.885757194077044)
-06:36:15,662 Updated Orientation: 4.56638839 radians
-06:36:15,674 Look-at Vector: Vector(-0.14548244309278507, -0.9893608334433673)
-06:36:15,685 
+11:32:09,248 ** Rotating -90deg **
+11:32:09,259 Target Tachos: -182.57142857142856
+11:32:10,211 Updating odometry
+11:32:10,225 Motor L pos after movement: 188
+11:32:10,238 Motor R pos after movement: -192
+11:32:10,252 Motor L pos after reset: -1
+11:32:10,264 Motor R pos after reset: 2
+11:32:10,277 Updated Position: Vector(39.98649610256517, -2.336241898707874)
+11:32:10,289 Updated Orientation: 6.27519612 radians
+11:32:10,300 Look-at Vector: Vector(-0.007989098208357553, 0.9999680866456775)
+11:32:10,311 
 
-06:36:15,695 - Moving forward 20cm -
-06:36:15,707 Motor L pos: -5
-06:36:15,719 Motor R pos: 6
-06:36:17,722 Motor L pos: 406
-06:36:17,733 Motor R pos: 418
-06:36:17,751 Updated Position: Vector(18.170821789342632, -22.993721463846096)
-06:36:17,762 Updated Orientation: 4.61313286 radians
-06:36:17,773 Look-at Vector: Vector(-0.09909322113800903, -0.9950781544805883)
-06:36:17,784 
+11:32:10,321 ** Moving forward 40cm **
+11:32:10,333 Target Tachos: 818.5111359011761
+11:32:14,291 Updating odometry
+11:32:14,316 Motor L pos after movement: 815
+11:32:14,328 Motor R pos after movement: 829
+11:32:14,342 Motor L pos after reset: 0
+11:32:14,355 Motor R pos after reset: -1
+11:32:14,368 Updated Position: Vector(42.08392690569751, 37.779461993009946)
+11:32:14,379 Updated Orientation: 0.05223697 radians
+11:32:14,390 Look-at Vector: Vector(0.05221321378181168, 0.9986359598505227)
+11:32:14,401 
 
-06:36:17,794 - Rotating 90deg -
-06:36:17,806 Motor L pos: -2
-06:36:17,818 Motor R pos: 1
-06:36:18,802 Motor L pos: 186
-06:36:18,813 Motor R pos: -186
-06:36:18,832 Updated Position: Vector(18.19514265932835, -22.996076336649402)
-06:36:18,842 Updated Orientation: 3.04506836 radians
-06:36:18,853 Look-at Vector: Vector(-0.9953451459057497, 0.09637448065676815)
-06:36:18,863 
+11:32:14,412 ** Rotating -90deg **
+11:32:14,422 Target Tachos: -182.57142857142856
+11:32:15,371 Updating odometry
+11:32:15,384 Motor L pos after movement: 185
+11:32:15,396 Motor R pos after movement: -192
+11:32:15,416 Motor L pos after reset: 0
+11:32:15,429 Motor R pos after reset: 1
+11:32:15,441 Updated Position: Vector(42.25496904319625, 37.77925176413936)
+11:32:15,452 Updated Orientation: 4.71361809 radians
+11:32:15,464 Look-at Vector: Vector(-0.999999244650413, 0.0012291047975690095)
+11:32:15,474 
 
-06:36:18,875 - Moving forward 20cm -
-06:36:18,886 Motor L pos: -4
-06:36:18,898 Motor R pos: 4
-06:36:20,903 Motor L pos: 408
-06:36:20,914 Motor R pos: 417
-06:36:20,932 Updated Position: Vector(-2.007191121051193, -21.903494570759452)
-06:36:20,942 Updated Orientation: 3.08756333 radians
-06:36:20,954 Look-at Vector: Vector(-0.9985407711614227, 0.05400303999175691)
-06:36:20,965 
+11:32:15,485 ** Moving forward 40cm **
+11:32:15,496 Target Tachos: 818.5111359011761
+11:32:19,451 Updating odometry
+11:32:19,473 Motor L pos after movement: 817
+11:32:19,486 Motor R pos after movement: 830
+11:32:19,501 Motor L pos after reset: 0
+11:32:19,512 Motor R pos after reset: -1
+11:32:19,527 Updated Position: Vector(2.091760726039624, 39.90391698814506)
+11:32:19,538 Updated Orientation: 4.76524050 radians
+11:32:19,550 Look-at Vector: Vector(-0.9986036835088528, 0.05282691816253455)
+11:32:19,560 
 
-06:36:20,975 - Rotating 90deg -
-06:36:20,986 Motor L pos: -2
-06:36:20,999 Motor R pos: 0
-06:36:21,982 Motor L pos: 186
-06:36:21,994 Motor R pos: -188
-06:36:22,11 Updated Position: Vector(-2.010949775486967, -21.97670197340338)
-06:36:22,23 Updated Orientation: 1.51949882 radians
-06:36:22,34 Look-at Vector: Vector(0.051275008528097486, 0.9986845715742502)
-06:36:22,44 
+11:32:19,571 ** Rotating -90deg **
+11:32:19,582 Target Tachos: -182.57142857142856
+11:32:20,531 Updating odometry
+11:32:20,546 Motor L pos after movement: 185
+11:32:20,558 Motor R pos after movement: -191
+11:32:20,572 Motor L pos after reset: 0
+11:32:20,584 Motor R pos after reset: 0
+11:32:20,598 Updated Position: Vector(2.0930370927132786, 40.02608336837164)
+11:32:20,609 Updated Orientation: 3.15204005 radians
+11:32:20,620 Look-at Vector: Vector(-0.010447203358794408, -0.9999454264818556)
+11:32:20,634 
 
-06:36:22,55 - Moving forward 20cm -
-06:36:22,66 Motor L pos: -5
-06:36:22,79 Motor R pos: 4
-06:36:24,82 Motor L pos: 407
-06:36:24,93 Motor R pos: 418
-06:36:24,112 Updated Position: Vector(-2.004823521942081, -1.7937154331087406)
-06:36:24,122 Updated Orientation: 1.57049279 radians
-06:36:24,134 Look-at Vector: Vector(0.00030353551742392165, 0.9999999539330938)
-06:36:24,144 
+11:32:20,646 ** Moving forward 40cm **
+11:32:20,658 Target Tachos: 818.5111359011761
+11:32:24,671 Updating odometry
+11:32:24,693 Motor L pos after movement: 813
+11:32:24,706 Motor R pos after movement: 824
+11:32:24,720 Motor L pos after reset: 0
+11:32:24,732 Motor R pos after reset: -1
+11:32:24,745 Updated Position: Vector(-0.3896432253386979, 0.07926745360055776)
+11:32:24,756 Updated Orientation: 3.20366246 radians
+11:32:24,769 Look-at Vector: Vector(-0.06202995992699074, -0.9980742878520896)
+11:32:24,779 
 
-06:36:24,155 - Rotating 90deg -
-06:36:24,167 Motor L pos: -2
-06:36:24,179 Motor R pos: 0
-06:36:25,162 Motor L pos: 187
-06:36:25,174 Motor R pos: -188
-06:36:25,196 Updated Position: Vector(-2.0536926599528105, -1.7936264318944204)
-06:36:25,207 Updated Orientation: 6.28136409 radians
-06:36:25,219 Look-at Vector: Vector(0.9999983415918213, -0.0018212121257433695)
-06:36:25,230 
-
-06:36:35,825 - Moving forward 20cm -
-06:36:35,841 Motor L pos: -6
-06:36:35,853 Motor R pos: 5
-06:36:37,882 Motor L pos: 408
-06:36:37,894 Motor R pos: 419
-06:36:37,912 Updated Position: Vector(18.056088751241347, -0.80397531179895)
-06:36:37,923 Updated Orientation: 0.04917275 radians
-06:36:37,934 Look-at Vector: Vector(0.9987912636893743, 0.04915294068296206)
-06:36:37,944 
-
-06:36:37,955 - Rotating -90deg -
-06:36:37,967 Motor L pos: -4
-06:36:37,979 Motor R pos: -5
-06:36:38,962 Motor L pos: -194
-06:36:38,974 Motor R pos: 182
-06:36:38,992 Updated Position: Vector(18.07054301329723, -1.04789351240443)
-06:36:39,2 Updated Orientation: 1.62998575 radians
-06:36:39,14 Look-at Vector: Vector(-0.059154872269861145, 0.9982488172228087)
-06:36:39,25 
-
-06:36:39,35 - Moving forward 20cm -
-06:36:39,47 Motor L pos: 4
-06:36:39,59 Motor R pos: -5
-06:36:41,62 Motor L pos: 416
-06:36:41,82 Motor R pos: 408
-06:36:41,99 Updated Position: Vector(17.819677177421898, 19.10909832078721)
-06:36:41,110 Updated Orientation: 1.58324128 radians
-06:36:41,122 Look-at Vector: Vector(-0.012444635168552393, 0.9999225625294799)
-06:36:41,132 
-
-06:36:41,142 - Rotating -90deg -
-06:36:41,154 Motor L pos: -3
-06:36:41,166 Motor R pos: -3
-06:36:42,142 Motor L pos: -192
-06:36:42,153 Motor R pos: 186
-06:36:42,171 Updated Position: Vector(17.941774500709155, 19.113399159732772)
-06:36:42,182 Updated Orientation: 3.17680277 radians
-06:36:42,193 Look-at Vector: Vector(-0.9993801877434627, -0.03520284570657851)
-06:36:42,204 
-
-06:36:42,214 - Moving forward 20cm -
-06:36:42,226 Motor L pos: 5
-06:36:42,238 Motor R pos: -5
-06:36:44,242 Motor L pos: 418
-06:36:44,254 Motor R pos: 409
-06:36:44,272 Updated Position: Vector(-2.313169351959491, 19.347037129356703)
-06:36:44,282 Updated Orientation: 3.13005830 radians
-06:36:44,294 Look-at Vector: Vector(-0.9999334801243881, 0.011534094083626552)
-06:36:44,305 
-
-06:36:44,315 - Rotating -90deg -
-06:36:44,327 Motor L pos: -2
-06:36:44,340 Motor R pos: -2
-06:36:45,322 Motor L pos: -191
-06:36:45,336 Motor R pos: 186
-06:36:45,353 Updated Position: Vector(-2.313021016577235, 19.44477545490572)
-06:36:45,364 Updated Orientation: 4.71087130 radians
-06:36:45,375 Look-at Vector: Vector(-0.0015176770278074023, -0.9999988483275565)
-06:36:45,386 
-
-06:36:45,397 - Moving forward 20cm -
-06:36:45,409 Motor L pos: 4
-06:36:45,420 Motor R pos: -5
-06:36:47,422 Motor L pos: 414
-06:36:47,434 Motor R pos: 407
-06:36:47,451 Updated Position: Vector(-3.1143774353071683, -0.6978430769814459)
-06:36:47,462 Updated Orientation: 4.67262583 radians
-06:36:47,474 Look-at Vector: Vector(-0.039752675912505205, -0.9992095499732753)
-06:36:47,484 
-
-06:36:47,495 - Rotating -90deg -
-06:36:47,506 Motor L pos: 1
-06:36:47,519 Motor R pos: -1
-06:36:48,503 Motor L pos: -186
-06:36:48,519 Motor R pos: 188
-06:36:48,536 Updated Position: Vector(-3.041139783624084, -0.7009571837530222)
-06:36:48,547 Updated Orientation: 6.24069033 radians
-06:36:48,559 Look-at Vector: Vector(0.9990972244975984, -0.04248218451534182)
-06:36:48,569 
+11:32:24,790 ** Rotating -90deg **
+11:32:24,801 Target Tachos: -182.57142857142856
+11:32:25,751 Updating odometry
+11:32:25,766 Motor L pos after movement: 187
+11:32:25,778 Motor R pos after movement: -189
+11:32:25,792 Motor L pos after reset: 0
+11:32:25,804 Motor R pos after reset: 0
+11:32:25,819 Updated Position: Vector(-0.4385066767971987, 0.08001824164687595)
+11:32:25,829 Updated Orientation: 1.58616014 radians
+11:32:25,844 Look-at Vector: Vector(0.9998819789337444, -0.015363209415323369)
+11:32:25,855 
 
