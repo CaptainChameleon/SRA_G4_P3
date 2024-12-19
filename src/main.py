@@ -1,100 +1,31 @@
 #!/usr/bin/env python3
-import abc
 import logging
 import math
 import time
-from time import sleep
+from statistics import mean
+
+from ev3dev2.sensor.lego import UltrasonicSensor
+from ev3dev2.sound import Sound
 
 from utils import Vector
-
-from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
-from ev3dev2.sound import Sound
+from wheels import WheelPlatform
 
 
 class Robot:
 
-    WHEEL_DIAMETER = 5.6  # centimeters
-    WHEEL_BASE = 11.36  # 11.5  # centimeters
-
-    CORRECTED_SPEED_R = 20.02  # 20.47
-    CORRECTED_SPEED_L = 19.98  # 19.54
+    MAX_RANGE_DIS = 20  # centimeters
 
     def __init__(self, log):
         self.log = log
-        self.left_motor = LargeMotor(OUTPUT_A)
-        self.right_motor = LargeMotor(OUTPUT_D)
+        self.wheels = WheelPlatform(self.log)
+        self.ultrasonic_sensor = UltrasonicSensor()
         self.sound = Sound()
+        self.obstacle_pos_1 = None
+        self.obstacle_pos_2 = None
 
-        self.pos = Vector(0, 0)
-        self.look_at = Vector(0, 1)
-        self.theta = math.pi / 2  # radians
-
-    def distance_to_wheel_rotation(self, distance: float) -> float:
-        return (distance / (math.pi * self.WHEEL_DIAMETER)) * 360
-
-    def rotation_to_wheel_degrees(self, degrees: float) -> float:
-        wheel_travel_distance = (degrees/360) * math.pi * self.WHEEL_BASE
-        return self.distance_to_wheel_rotation(wheel_travel_distance)
-
-    def update_odometry(self):
-        self.log.info("Updating odometry")
-
-        # Get current tacho counts
-        left_tacho = self.left_motor.position
-        right_tacho = self.right_motor.position
-        self.log.info("Motor L pos after movement: {}".format(self.left_motor.position))
-        self.log.info("Motor R pos after movement: {}".format(self.right_motor.position))
-
-        # Reset motor tachos
-        self.left_motor.reset()
-        self.right_motor.reset()
-        self.log.info("Motor L pos after reset: {}".format(self.left_motor.position))
-        self.log.info("Motor R pos after reset: {}".format(self.right_motor.position))
-
-        # Compute wheel distances
-        d_left = (left_tacho / 360) * math.pi * self.WHEEL_DIAMETER
-        d_right = (right_tacho / 360) * math.pi * self.WHEEL_DIAMETER
-
-        # Compute displacement and orientation change
-        d_center = (d_left + d_right) / 2
-        delta_theta = (d_right - d_left) / self.WHEEL_BASE
-
-        # Update robot's orientation (theta)
-        self.theta += delta_theta
-        self.theta %= (2 * math.pi)  # Keep theta within [0, 2*pi]
-
-        # Update position
-        dx = d_center * math.sin(self.theta)
-        dy = d_center * math.cos(self.theta)
-        self.pos.x += dx
-        self.pos.y += dy
-
-        # Update look_at vector
-        self.look_at.x = math.sin(self.theta)
-        self.look_at.y = math.cos(self.theta)
-
-        # Log updated values
-        self.log.info("Updated Position: {}".format(self.pos))
-        self.log.info("Updated Orientation: {:.8f} radians".format(self.theta))
-        self.log.info("Look-at Vector: {}".format(self.look_at))
-
-    def move_forward(self, distance: float, speed=20):
-        self.log.info("** Moving forward {}cm **".format(distance))
-        degrees_to_turn = self.distance_to_wheel_rotation(distance)
-        self.log.info("Target Tachos: {}".format(degrees_to_turn))
-        self.left_motor.on_for_degrees(degrees=degrees_to_turn, speed=SpeedPercent(self.CORRECTED_SPEED_L), brake=True, block=False)
-        self.right_motor.on_for_degrees(degrees=degrees_to_turn, speed=SpeedPercent(self.CORRECTED_SPEED_R), brake=True, block=True)
-        self.update_odometry()
-        self.log.info("\n")
-
-    def turn_degrees(self, degrees: float, speed=20):
-        self.log.info("** Rotating {}deg **".format(degrees))
-        wheel_degrees = self.rotation_to_wheel_degrees(degrees)
-        self.log.info("Target Tachos: {}".format(wheel_degrees))
-        self.left_motor.on_for_degrees(degrees=-wheel_degrees, speed=SpeedPercent(self.CORRECTED_SPEED_L), brake=True, block=False)
-        self.right_motor.on_for_degrees(degrees=wheel_degrees, speed=SpeedPercent(self.CORRECTED_SPEED_R), brake=True, block=True)
-        self.update_odometry()
-        self.log.info("\n")
+    def beep(self, n=1):
+        for _ in range(n):
+            self.sound.beep()
 
     def wait(self, duration: int = 5):
         self.sound.beep()
@@ -104,13 +35,56 @@ class Robot:
     def make_square(self, side_len: float = 20, clockwise: bool = True):
         degrees = -90 if clockwise else 90
         for _ in range(4):
-            self.move_forward(side_len)
-            self.turn_degrees(degrees)
+            self.wheels.move_straight(side_len)
+            self.wheels.turn_degrees(degrees)
 
     def bilateral_test(self, square_size=40, wait_time=10):
         self.make_square()
         self.wait(duration=wait_time)
         self.make_square(clockwise=False)
+
+    def scan_obstacle(self, obstacle_dis):
+        initial_theta = self.wheels.theta
+        current_dis = obstacle_dis
+        self.wheels.turn_forever()
+        while current_dis <= obstacle_dis * 1.1:
+            current_dis = self.ultrasonic_sensor.distance_centimeters
+            self.log.info("Scanning obstacle to the left: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
+        self.wheels.stop()
+        mediatriz_izq = self.wheels.theta
+        self.wheels.turn_degrees(math.degrees(-(mediatriz_izq-initial_theta)))
+        self.log.info("Found obstacle, turned {} and turning back to initial theta".format(mediatriz_izq))
+
+        time.sleep(0.5)
+
+        current_dis = obstacle_dis
+        self.wheels.turn_forever(clockwise=True)
+        while current_dis <= obstacle_dis * 1.1:
+            self.log.info("Scanning obstacle to the right: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
+            current_dis = self.ultrasonic_sensor.distance_centimeters
+            self.log.info("Scanning obstacle to the right: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
+        self.wheels.stop()
+        mediatriz_der = self.wheels.theta
+        self.wheels.turn_degrees(math.degrees(initial_theta-mediatriz_der))
+        self.wheels.pos = Vector(0, 0)
+
+        beta = mediatriz_izq - (mediatriz_izq - mediatriz_der) / 2
+        self.obstacle_pos_1 = Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
+        self.log.info("Found obstacle at {}".format(self.obstacle_pos_1))
+
+    def run(self):
+        self.beep(2)
+        self.wheels.run_forever()
+        while True:
+            dis_to_obstacle = self.ultrasonic_sensor.distance_centimeters
+            if dis_to_obstacle <= self.MAX_RANGE_DIS:
+                self.wheels.stop()
+                self.scan_obstacle(dis_to_obstacle)
+                break
+            # self.log.info("Mean distance: {} cm\n".format(dis_to_obstacle))
+            # if dis_to_obstacle < self.MAX_RANGE_DIS:
+            #     self.wheels.move_straight(-(self.MAX_RANGE_DIS - dis_to_obstacle))
+        self.beep(3)
 
 
 if __name__ == '__main__':
@@ -122,7 +96,7 @@ if __name__ == '__main__':
     logger = logging.getLogger('ev3dev')
     robot = Robot(logger)
 
-    robot.make_square(40, clockwise=True)
+    robot.run()
 
     # # APARTADO A
     # robot.make_square()

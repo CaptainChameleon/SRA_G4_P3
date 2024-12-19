@@ -1,96 +1,56 @@
-11:32:05,111 ** Moving forward 40cm **
-11:32:05,124 Target Tachos: 818.5111359011761
-11:32:09,131 Updating odometry
-11:32:09,151 Motor L pos after movement: 813
-11:32:09,162 Motor R pos after movement: 824
-11:32:09,178 Motor L pos after reset: 0
-11:32:09,190 Motor R pos after reset: -2
-11:32:09,203 Updated Position: Vector(39.985715260584364, -2.238506579757599)
-11:32:09,214 Updated Orientation: 1.62672061 radians
-11:32:09,226 Look-at Vector: Vector(0.9984366448371537, -0.05589513615984286)
-11:32:09,236 
+17:49:38,690 Running 19.98%
+17:49:47,388 Updating odometry
+17:49:47,411 Updated Position: Vector(88.60674609580315, -3.432285790967847)
+17:49:47,422 Updated Orientation: 1.60951314 radians
+17:49:47,435 Look-at Vector: Vector(0.9992505978972573, -0.03870713890193661)
+17:49:47,447 Motor L pos after movement: 1818
+17:49:47,460 Motor R pos after movement: 1829
+17:49:47,480 Motor L pos after reset: 0
+17:49:47,491 Motor R pos after reset: 3
+17:49:47,503 Running counter-clockwise rotation
+17:49:47,531 Scanning obstacle to the left: 255.0 cm [Initial distance: 19.900000000000002]
+17:49:47,545 Updating odometry
+17:49:47,563 Updated Position: Vector(89.07038522029049, -3.456241245229775)
+17:49:47,574 Updated Orientation: 1.62241874 radians
+17:49:47,585 Look-at Vector: Vector(0.9986678590325272, -0.05159948968147241)
+17:49:47,598 Motor L pos after movement: 8
+17:49:47,611 Motor R pos after movement: 14
+17:49:47,626 Motor L pos after reset: 0
+17:49:47,639 Motor R pos after reset: 0
+17:49:47,650 ** Rotating -0.7394366197183078deg **
+17:49:47,663 Target Tachos: -1.4999999999999956
+17:49:47,833 Updating odometry
+17:49:47,850 Updated Position: Vector(89.07038522029049, -3.456241245229775)
+17:49:47,862 Updated Orientation: 1.62241874 radians
+17:49:47,873 Look-at Vector: Vector(0.9986678590325272, -0.05159948968147241)
+17:49:47,891 Motor L pos after movement: 1
+17:49:47,902 Motor R pos after movement: 0
+17:49:47,919 Motor L pos after reset: 0
+17:49:47,931 Motor R pos after reset: 0
+17:49:47,942 
 
-11:32:09,248 ** Rotating -90deg **
-11:32:09,259 Target Tachos: -182.57142857142856
-11:32:10,211 Updating odometry
-11:32:10,225 Motor L pos after movement: 188
-11:32:10,238 Motor R pos after movement: -192
-11:32:10,252 Motor L pos after reset: -1
-11:32:10,264 Motor R pos after reset: 2
-11:32:10,277 Updated Position: Vector(39.98649610256517, -2.336241898707874)
-11:32:10,289 Updated Orientation: 6.27519612 radians
-11:32:10,300 Look-at Vector: Vector(-0.007989098208357553, 0.9999680866456775)
-11:32:10,311 
+17:49:47,952 Found obstacle, turned 1.622418741290503 and turning back to initial theta
+17:49:48,466 Running clockwise rotation
+17:49:48,491 Scanning obstacle to the right: 19.900000000000002 cm [Initial distance: 19.900000000000002]
+17:49:48,505 Scanning obstacle to the right: 255.0 cm [Initial distance: 19.900000000000002]
+17:49:48,520 Updating odometry
+17:49:48,538 Updated Position: Vector(89.07038522029049, -3.456241245229775)
+17:49:48,548 Updated Orientation: 1.60521127 radians
+17:49:48,560 Look-at Vector: Vector(0.9994078642959321, -0.03440814995671585)
+17:49:48,573 Motor L pos after movement: 5
+17:49:48,585 Motor R pos after movement: -5
+17:49:48,600 Motor L pos after reset: 0
+17:49:48,617 Motor R pos after reset: 0
+17:49:48,631 ** Rotating 0.2464788732394444deg **
+17:49:48,643 Target Tachos: 0.5000000000000158
+17:49:48,690 Updating odometry
+17:49:48,708 Updated Position: Vector(88.99716344861046, -3.452773762414245)
+17:49:48,718 Updated Orientation: 1.61811687 radians
+17:49:48,731 Look-at Vector: Vector(0.9988805918418817, -0.047302888300950065)
+17:49:48,744 Motor L pos after movement: -4
+17:49:48,756 Motor R pos after movement: 1
+17:49:48,771 Motor L pos after reset: 0
+17:49:48,784 Motor R pos after reset: -1
+17:49:48,795 
 
-11:32:10,321 ** Moving forward 40cm **
-11:32:10,333 Target Tachos: 818.5111359011761
-11:32:14,291 Updating odometry
-11:32:14,316 Motor L pos after movement: 815
-11:32:14,328 Motor R pos after movement: 829
-11:32:14,342 Motor L pos after reset: 0
-11:32:14,355 Motor R pos after reset: -1
-11:32:14,368 Updated Position: Vector(42.08392690569751, 37.779461993009946)
-11:32:14,379 Updated Orientation: 0.05223697 radians
-11:32:14,390 Look-at Vector: Vector(0.05221321378181168, 0.9986359598505227)
-11:32:14,401 
-
-11:32:14,412 ** Rotating -90deg **
-11:32:14,422 Target Tachos: -182.57142857142856
-11:32:15,371 Updating odometry
-11:32:15,384 Motor L pos after movement: 185
-11:32:15,396 Motor R pos after movement: -192
-11:32:15,416 Motor L pos after reset: 0
-11:32:15,429 Motor R pos after reset: 1
-11:32:15,441 Updated Position: Vector(42.25496904319625, 37.77925176413936)
-11:32:15,452 Updated Orientation: 4.71361809 radians
-11:32:15,464 Look-at Vector: Vector(-0.999999244650413, 0.0012291047975690095)
-11:32:15,474 
-
-11:32:15,485 ** Moving forward 40cm **
-11:32:15,496 Target Tachos: 818.5111359011761
-11:32:19,451 Updating odometry
-11:32:19,473 Motor L pos after movement: 817
-11:32:19,486 Motor R pos after movement: 830
-11:32:19,501 Motor L pos after reset: 0
-11:32:19,512 Motor R pos after reset: -1
-11:32:19,527 Updated Position: Vector(2.091760726039624, 39.90391698814506)
-11:32:19,538 Updated Orientation: 4.76524050 radians
-11:32:19,550 Look-at Vector: Vector(-0.9986036835088528, 0.05282691816253455)
-11:32:19,560 
-
-11:32:19,571 ** Rotating -90deg **
-11:32:19,582 Target Tachos: -182.57142857142856
-11:32:20,531 Updating odometry
-11:32:20,546 Motor L pos after movement: 185
-11:32:20,558 Motor R pos after movement: -191
-11:32:20,572 Motor L pos after reset: 0
-11:32:20,584 Motor R pos after reset: 0
-11:32:20,598 Updated Position: Vector(2.0930370927132786, 40.02608336837164)
-11:32:20,609 Updated Orientation: 3.15204005 radians
-11:32:20,620 Look-at Vector: Vector(-0.010447203358794408, -0.9999454264818556)
-11:32:20,634 
-
-11:32:20,646 ** Moving forward 40cm **
-11:32:20,658 Target Tachos: 818.5111359011761
-11:32:24,671 Updating odometry
-11:32:24,693 Motor L pos after movement: 813
-11:32:24,706 Motor R pos after movement: 824
-11:32:24,720 Motor L pos after reset: 0
-11:32:24,732 Motor R pos after reset: -1
-11:32:24,745 Updated Position: Vector(-0.3896432253386979, 0.07926745360055776)
-11:32:24,756 Updated Orientation: 3.20366246 radians
-11:32:24,769 Look-at Vector: Vector(-0.06202995992699074, -0.9980742878520896)
-11:32:24,779 
-
-11:32:24,790 ** Rotating -90deg **
-11:32:24,801 Target Tachos: -182.57142857142856
-11:32:25,751 Updating odometry
-11:32:25,766 Motor L pos after movement: 187
-11:32:25,778 Motor R pos after movement: -189
-11:32:25,792 Motor L pos after reset: 0
-11:32:25,804 Motor R pos after reset: 0
-11:32:25,819 Updated Position: Vector(-0.4385066767971987, 0.08001824164687595)
-11:32:25,829 Updated Orientation: 1.58616014 radians
-11:32:25,844 Look-at Vector: Vector(0.9998819789337444, -0.015363209415323369)
-11:32:25,855 
-
+17:49:48,808 Found obstacle at Vector(-0.8558076894738208, 19.881589302634676)
