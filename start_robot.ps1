@@ -1,11 +1,9 @@
 param (
-    [Alias("r")][switch]$RunOnly,
-    [Alias("p")][switch]$PushOnly
+    [Alias("r")][switch]$Run,
+    [Alias("p")][switch]$Push,
+    [Alias("l")][switch]$Logs
 )
-if ($RunOnly -and $PushOnly) {
-    Write-Host "ERROR: You cannot use both -RunOnly and -PushOnly at the same time." -ForegroundColor Red
-    exit 1
-}
+$single_commands = $Run -or $Push -or $Logs
 
 
 function Check-Command($cmdname)
@@ -22,12 +20,12 @@ if (-not (Check-Command -cmdname 'plink'))
 $currentPath = Get-Location
 if (-not ($currentPath.path.EndsWith("SRA_G4_P3")))
 {
-    Write-Host "ERROR: Please run this script from the 'SRA_G4_P3' folder"
+    Write-Host "ERROR: Please run this script from the 'SRA_G4_P3' folder" -ForegroundColor Red
     exit 1
 }
 if (-not (Test-Connection -ComputerName ev3dev -Count 1 -Quiet))
 {
-    Write-Host "ERROR: EV3DEV is not reachable."
+    Write-Host "ERROR: EV3DEV is not reachable." -ForegroundColor Red
     exit 1
 }
 if (-not (Test-Path -Path "./logs"))
@@ -37,26 +35,25 @@ if (-not (Test-Path -Path "./logs"))
 
 
 $password = "maker"
-if (-not $RunOnly)
+if (-not $single_commands -or ($single_commands -and $Push))
 {
     # PUSH SOURCE CODE TO EV3DEV
-    Write-Host "Pushing code to EV3DEV..."
-    $ev3dev_launch_script = "rm -r /home/robot/SRA_G4_P3/*"
-    plink -batch -ssh robot@ev3dev -pw $password $ev3dev_launch_script
+    Write-Host "Pushing code to EV3DEV..." -ForegroundColor Green
+    plink -batch -ssh robot@ev3dev -pw $password "rm -r /home/robot/SRA_G4_P3/*"
     pscp -batch -r -pw $password ./src robot@ev3dev:/home/robot/SRA_G4_P3
-    $ev3dev_launch_script = "chmod +rx /home/robot/SRA_G4_P3/src/*.py"
-    plink -batch -ssh robot@ev3dev -pw $password $ev3dev_launch_script
+    plink -batch -ssh robot@ev3dev -pw $password "chmod +rx /home/robot/SRA_G4_P3/src/*.py"
 }
-if (-not $PushOnly)
+if (-not $single_commands -or ($single_commands -and $Run))
 {
     # LAUNCH SCRIPT WITHIN EV3DEV
-    Write-Host "Launching EV3DEV program..."
-    $ev3dev_launch_script = "python3 /home/robot/SRA_G4_P3/src/main.py"
-    plink -batch -ssh robot@ev3dev -pw $password $ev3dev_launch_script
-
+    Write-Host "Launching EV3DEV program..." -ForegroundColor Green
+    plink -batch -ssh robot@ev3dev -pw $password "python3 /home/robot/SRA_G4_P3/src/main.py"
+}
+if (-not $single_commands -or ($single_commands -and $Logs))
+{
     # GET LOGS
-    Write-Host "Downloading logs..."
+    Write-Host "Downloading logs..." -ForegroundColor Green
     pscp -batch -pw $password robot@ev3dev:/home/robot/SRA_G4_P3/*.log ./logs/
 }
 
-Write-Host "Done!"
+Write-Host "Done!" -ForegroundColor Green
