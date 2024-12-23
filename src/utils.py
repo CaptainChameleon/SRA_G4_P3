@@ -30,7 +30,7 @@ class Vector:
         return Vector(new_x, new_y)
 
     def __repr__(self):
-        return "Vector({}, {})".format(self.x, self.y)
+        return "Vector({:.4f}, {:.4f})".format(self.x, self.y)
 
 
 if __name__ == "__main__":
