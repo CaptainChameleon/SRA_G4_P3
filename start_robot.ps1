@@ -54,6 +54,7 @@ if (-not $single_commands -or ($single_commands -and $Logs))
     # GET LOGS
     Write-Host "Downloading logs..." -ForegroundColor Green
     pscp -batch -pw $password robot@ev3dev:/home/robot/SRA_G4_P3/*.log ./logs/
+    pscp -batch -pw $password robot@ev3dev:/home/robot/SRA_G4_P3/src/*.log ./logs/
 }
 
 Write-Host "Done!" -ForegroundColor Green
