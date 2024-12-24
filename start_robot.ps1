@@ -41,6 +41,7 @@ if (-not $single_commands -or ($single_commands -and $Push))
     Write-Host "Pushing code to EV3DEV..." -ForegroundColor Green
     plink -batch -ssh robot@ev3dev -pw $password "rm -r /home/robot/SRA_G4_P3/*"
     pscp -batch -r -pw $password ./src robot@ev3dev:/home/robot/SRA_G4_P3
+    pscp -batch -pw $password ./config.ini robot@ev3dev:/home/robot/SRA_G4_P3
     plink -batch -ssh robot@ev3dev -pw $password "chmod +rx /home/robot/SRA_G4_P3/src/*.py"
 }
 if (-not $single_commands -or ($single_commands -and $Run))

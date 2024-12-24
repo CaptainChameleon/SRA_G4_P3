@@ -57,11 +57,16 @@ class SquareTestController(RobotController):
 
     def apartado_b(self):
         for _ in range(10):
-            self.make_square()
+            self.make_square(50)
+
+        #self.wait(20)
+        
+        #for _ in range(10):
+            #self.make_square(50, clockwise=False)
 
     def apartado_c(self):
-        for _ in range(10):
-            self.make_square(clockwise=False)
+        # Determinar si existe error sistemático.
+        pass
 
     def apartado_d(self):
         # Forzar la aparición de error sistemático y comprobar si el test aplica las correcciones adecuadas.
@@ -76,12 +81,12 @@ class SquareTestController(RobotController):
         pass
 
     def move(self):
-        self.apartado_a()
+        #self.apartado_a()
         self.apartado_b()
-        self.apartado_c()
-        self.apartado_d()
-        self.apartado_e()
-        self.apartado_f()
+        #self.apartado_c()
+        #self.apartado_d()
+        #self.apartado_e()
+        #self.apartado_f()
         self.stop()
 
 
@@ -188,6 +193,6 @@ if __name__ == '__main__':
         config.getfloat("Base", "speed_correction"),
         config.getfloat("Base", "initial_theta")
     )
-    robot_controller = ParkingController(logger, robot)
-    # robot_controller = SquareTestController(logger, robot)
+    #robot_controller = ParkingController(logger, robot)
+    robot_controller = SquareTestController(logger, robot)
     robot_controller.run()
