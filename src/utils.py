@@ -12,6 +12,9 @@ class Vector:
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
 
+    def __len__(self):
+        return math.sqrt(self.x**2 + self.y**2)
+
     def dot(self, other):
         if isinstance(other, Vector):
             return self.x * other.x + self.y * other.y
