@@ -130,10 +130,10 @@ class ParkingController(RobotController):
         )
         self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
         self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
-        self.scan_obstacle(min_dis)
+        self.obstacle_pos_1 = self.scan_obstacle(min_dis)
 
     def search_for_second_obstacle(self):
-        pass
+        self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
 
     def scan_obstacle(self, obstacle_dis) -> Vector:
         initial_theta = self.robot.theta
@@ -165,6 +165,7 @@ class ParkingController(RobotController):
 
     def move(self):
         self.search_for_first_obstacle()
+        self.search_for_second_obstacle()
         self.stop()
         # self.robot.run_forever()
         # while True:
