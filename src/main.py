@@ -56,13 +56,13 @@ class SquareTestController(RobotController):
         self.make_square()
 
     def apartado_b(self):
-        for _ in range(10):
+        for _ in range(1):
             self.make_square(50)
 
-        #self.wait(20)
+        self.wait(20)
         
         #for _ in range(10):
-            #self.make_square(50, clockwise=False)
+        #    self.make_square(50, clockwise=False)
 
     def apartado_c(self):
         # Determinar si existe error sistemático.
