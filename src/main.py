@@ -82,6 +82,7 @@ class SquareTestController(RobotController):
         self.apartado_d()
         self.apartado_e()
         self.apartado_f()
+        self.stop()
 
 
 class ParkingController(RobotController):
@@ -180,7 +181,7 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read("../config.ini")
     robot = Robot(
-        logger,
+        logger, 
         config.getfloat("Base", "wheel_diameter"),
         config.getfloat("Base", "wheel_base"),
         config.getfloat("Base", "base_speed"),
