@@ -10,6 +10,7 @@ from robot import Robot
 from utils import Vector
 
 
+
 class RobotController(abc.ABC):
     
     def __init__(self, log, robot: Robot):
@@ -41,23 +42,25 @@ class SquareTestController(RobotController):
         self.robot.beep(2)
         time.sleep(duration)
     
-    def make_square(self, side_len: float = 20, clockwise: bool = True):
-        degrees = -90 if clockwise else 90
-        for _ in range(4):
-            self.robot.move_straight(side_len)
-            self.robot.turn_degrees(degrees)
+    def make_square(self, clockwise: bool = True):
 
-    def bilateral_test(self, square_size=40, wait_time=10):
-        self.make_square()
-        self.wait(duration=wait_time)
-        self.make_square(clockwise=False)
+        if not clockwise:
+            for _ in range(4):
+                self.robot.move_straight(self.robot.base_speed)
+                self.robot.turn_left(self.robot.base_speed)
+            pass
+        else:
+            for _ in range(4):
+                self.robot.move_straight(self.robot.base_speed)
+                self.robot.turn_right(self.robot.base_speed)
+
 
     def apartado_a(self):
         self.make_square()
 
     def apartado_b(self):
         for _ in range(1):
-            self.make_square(50)
+            self.make_square()
 
         self.wait(20)
         

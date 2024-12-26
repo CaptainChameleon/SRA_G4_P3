@@ -85,7 +85,7 @@ class Robot:
         self.log.info("Updated Orientation: {:.4f} radians".format(self.theta))
         self.log.info("Look-at Vector: {}".format(self.look_at))
 
-    def move_straight(self, distance: float):
+    '''def move_straight(self, distance: float):
         self.log.info("||> MOVING {} {:.4f} cm".format("FORWARD" if distance > 0 else "BACKWARD", distance))
         degrees_to_turn = self.distance_to_tachos(distance)
         self.log.info("Target Tachos: {:.4f}".format(degrees_to_turn))
@@ -96,8 +96,34 @@ class Robot:
         self.update_odometry()
         self.reset_motors()
         self.log.info("\n")
+    '''
 
-    def turn_degrees(self, degrees: float, speed=20):
+    def getStraightDegrees(self):
+        return (0.5 / (math.pi*self.wheel_diameter / 100)) * 360
+
+    def getTurnDegrees(self):
+        return (((self.wheel_base * math.pi) / 4) / (math.pi * self.wheel_diameter) ) * 360
+
+    def move_straight(self, speed):
+        degrees = self.getStraightDegrees()
+        self.left_motor.on_for_degrees(speed=speed, degrees=degrees, brake=True, block=False)
+        self.right_motor.on_for_degrees(speed=speed, degrees=degrees, brake=True, block=True)
+
+    def turn_left(self, speed):
+        degrees = self.getTurnDegrees()
+
+        self.right_motor.on_for_degrees(speed=speed, degrees=degrees, brake=True, block=False)
+        self.left_motor.on_for_degrees(speed=-speed, degrees=degrees, brake=True, block=True)
+
+    def turn_right(self, speed):
+        degrees = self.getTurnDegrees()
+
+        self.left_motor.on_for_degrees(speed=speed, degrees=degrees, brake=True, block=False)
+        self.right_motor.on_for_degrees(speed=-speed, degrees=degrees, brake=True, block=True)
+
+
+
+    '''def turn_degrees(self, degrees: float, speed=20):
         self.log.info("||> ROTATING {:.4f} deg...".format(degrees))
         wheel_degrees = self.rotation_to_wheel_degrees(degrees)
         self.log.info("Target Tachos: {:.4f}".format(wheel_degrees))
@@ -107,7 +133,7 @@ class Robot:
                                         block=True)
         self.update_odometry()
         self.reset_motors()
-        self.log.info("\n")
+        self.log.info("\n") '''
 
     def run_forever(self):
         self.log.info("||> MOVING IN A STRAIGHT LINE...")
