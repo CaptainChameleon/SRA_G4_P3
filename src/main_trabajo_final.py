@@ -1,99 +1,15 @@
 #!/usr/bin/env python3
-
-import abc
 import logging
 import math
-import time
-from configparser import ConfigParser
 
-from robot import Robot
+from robot import RobotController
 from utils import Vector
-
-
-class RobotController(abc.ABC):
-    
-    def __init__(self, log, robot: Robot):
-        self.log = log
-        self.robot = robot
-        self.moving = False
-
-    def start(self):
-        self.robot.beep(2)
-        self.moving = True
-        
-    def stop(self):
-        self.moving = False
-        self.robot.beep(3)
-        
-    @abc.abstractmethod
-    def move(self):
-        pass
- 
-    def run(self):
-        self.start()
-        while self.moving:
-            self.move()
-        
-        
-class SquareTestController(RobotController):
-    
-    def wait(self, duration: int = 5):
-        self.robot.beep(2)
-        time.sleep(duration)
-    
-    def make_square(self, side_len: float = 20, clockwise: bool = True):
-        degrees = -90 if clockwise else 90
-        for _ in range(4):
-            self.robot.move_straight(side_len)
-            self.robot.turn_degrees(degrees)
-
-    def bilateral_test(self, square_size=40, wait_time=10):
-        self.make_square()
-        self.wait(duration=wait_time)
-        self.make_square(clockwise=False)
-
-    def apartado_a(self):
-        self.make_square()
-
-    def apartado_b(self):
-        for _ in range(1):
-            self.make_square(50)
-
-        self.wait(20)
-        
-        #for _ in range(10):
-        #    self.make_square(50, clockwise=False)
-
-    def apartado_c(self):
-        # Determinar si existe error sistemático.
-        pass
-
-    def apartado_d(self):
-        # Forzar la aparición de error sistemático y comprobar si el test aplica las correcciones adecuadas.
-        pass
-
-    def apartado_e(self):
-        # Construir una plataforma diferencial con una geometría diferente y comparar y justificar los resultados.
-        pass
-
-    def apartado_f(self):
-        # Caracterización del error de otros sensores: ultrasonidos, orientación
-        pass
-
-    def move(self):
-        #self.apartado_a()
-        self.apartado_b()
-        #self.apartado_c()
-        #self.apartado_d()
-        #self.apartado_e()
-        #self.apartado_f()
-        self.stop()
 
 
 class ParkingController(RobotController):
     
-    def __init__(self, log, robot: Robot):
-        super().__init__(log, robot)
+    def __init__(self, log_name: str, log_level: int = logging.DEBUG):
+        super().__init__(log_name, log_level)
         self.obstacle_pos_1 = None
         self.obstacle_pos_2 = None
     
@@ -166,34 +82,8 @@ class ParkingController(RobotController):
     def move(self):
         self.search_for_first_obstacle()
         self.search_for_second_obstacle()
-        self.stop()
-        # self.robot.run_forever()
-        # while True:
-        #     dis_to_obstacle = self.ultrasonic_sensor.distance_centimeters
-        #     if dis_to_obstacle <= self.MAX_RANGE_DIS:
-        #         self.robot.stop()
-        #         self.scan_obstacle(dis_to_obstacle)
-        #         break
-            # self.log.info("Mean distance: {} cm\n".format(dis_to_obstacle))
-            # if dis_to_obstacle < self.MAX_RANGE_DIS:
-            #     self.robot.move_straight(-(self.MAX_RANGE_DIS - dis_to_obstacle))
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="/home/robot/SRA_G4_P3/sra_grupo4.log",
-                        filemode='w+',
-                        level=logging.DEBUG)
-    logger = logging.getLogger('ev3dev')
-    config = ConfigParser()
-    config.read("../config.ini")
-    robot = Robot(
-        logger, 
-        config.getfloat("Base", "wheel_diameter"),
-        config.getfloat("Base", "wheel_base"),
-        config.getfloat("Base", "base_speed"),
-        config.getfloat("Base", "speed_correction"),
-        config.getfloat("Base", "initial_theta")
-    )
-    #robot_controller = ParkingController(logger, robot)
-    robot_controller = SquareTestController(logger, robot)
+    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final")
     robot_controller.run()
