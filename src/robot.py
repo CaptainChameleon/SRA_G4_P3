@@ -1,4 +1,7 @@
+import abc
+import logging
 import math
+from configparser import ConfigParser
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
 from ev3dev2.sensor.lego import UltrasonicSensor
@@ -8,8 +11,6 @@ from utils import Vector
 
 
 class Robot:
-
-    MAX_RANGE_DIS = 20  # centimeters
 
     def __init__(self, log,
                  wheel_diameter: float, wheel_base: float,
@@ -121,9 +122,9 @@ class Robot:
             "||> ROTATING {}...".format("AROUND {}".format(center_of_rotation) if center_of_rotation else "IN PLACE")
         )
         if center_of_rotation:
-            distance_to_center = len(center_of_rotation - self.pos)
+            distance_to_center = (center_of_rotation - self.pos).length
             robot_cor_angle = math.degrees(
-                math.acos(center_of_rotation.dot(self.look_at) / len(center_of_rotation) * len(self.look_at))
+                math.acos(center_of_rotation.dot(self.look_at) / center_of_rotation.length * self.look_at.length)
             )
             if robot_cor_angle != 90:
                 self.turn_degrees(90 - robot_cor_angle)
@@ -150,3 +151,30 @@ class Robot:
         self.update_odometry()
         self.reset_motors()
         self.log.info("\n")
+
+
+class RobotController(abc.ABC):
+
+    def __init__(self, log_name: str = "sra_grupo4", log_level: int = logging.DEBUG):
+        log_path = "/home/robot/SRA_G4_P3/{}.log".format(log_name)
+        logging.basicConfig(filename=log_path, filemode='w+', level=log_level)
+        self.log = logging.getLogger('ev3dev')
+        self.config = ConfigParser()
+        self.config.read("../config.ini")
+        self.robot = Robot(
+            self.log,
+            self.config.getfloat("Base", "wheel_diameter"),
+            self.config.getfloat("Base", "wheel_base"),
+            self.config.getfloat("Base", "base_speed"),
+            self.config.getfloat("Base", "speed_correction"),
+            self.config.getfloat("Base", "initial_theta")
+        )
+
+    @abc.abstractmethod
+    def move(self):
+        pass
+
+    def run(self):
+        self.robot.beep(2)
+        self.move()
+        self.robot.beep(3)
