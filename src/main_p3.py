@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 
 from robot import RobotController
@@ -21,8 +23,8 @@ class SquareTestController(RobotController):
         self.make_square(side_len=square_size, clockwise=False)
 
     def move(self):
-        # A)
-        self.make_square()
+        # A) Make a square
+        self.make_square(clockwise=False)
 
         # B)
         # for _ in range(10):
