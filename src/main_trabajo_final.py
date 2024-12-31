@@ -51,29 +51,29 @@ class ParkingController(RobotController):
     def search_for_second_obstacle(self):
         self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
 
+    def _scan_until_not_detected(self, initial_theta: float, obstacle_dis: float, clockwise: bool) -> float:
+        current_dis = obstacle_dis
+
+        # Scan until obstacle is no longer detected
+        self.robot.turn_forever(clockwise=clockwise)
+        while current_dis <= obstacle_dis * 1.1:
+            current_dis = self.robot.ultrasonic_sensor.distance_centimeters
+            self.log.debug(
+                "Scanning obstacle to the left: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
+        self.robot.stop()
+        theta_limit = self.robot.theta
+
+        # Restore theta & return
+        self.robot.turn_degrees(math.degrees(initial_theta - theta_limit))
+        self.log.debug("Found obstacle, turned {} and turning back to initial theta".format(theta_limit))
+        return theta_limit
+
     def scan_obstacle(self, obstacle_dis) -> Vector:
         initial_theta = self.robot.theta
-        current_dis = obstacle_dis
-        self.robot.turn_forever()
-        while current_dis <= obstacle_dis * 1.1:
-            current_dis = self.robot.ultrasonic_sensor.distance_centimeters
-            self.log.debug("Scanning obstacle to the left: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
-        self.robot.stop()
-        mediatriz_izq = self.robot.theta
-        self.robot.turn_degrees(math.degrees(-(mediatriz_izq-initial_theta)))
-        self.log.debug("Found obstacle, turned {} and turning back to initial theta".format(mediatriz_izq))
-
-        current_dis = obstacle_dis
-        self.robot.turn_forever(clockwise=True)
-        while current_dis <= obstacle_dis * 1.1:
-            self.log.debug("Scanning obstacle to the right: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
-            current_dis = self.robot.ultrasonic_sensor.distance_centimeters
-            self.log.debug("Scanning obstacle to the right: {} cm [Initial distance: {}]".format(current_dis, obstacle_dis))
-        self.robot.stop()
-        mediatriz_der = self.robot.theta
+        mediatriz_izq = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=False)
+        mediatriz_der = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=True)
         self.robot.turn_degrees(math.degrees(initial_theta-mediatriz_der))
         self.robot.pos = Vector(0, 0)
-
         beta = mediatriz_izq - (mediatriz_izq - mediatriz_der) / 2
         obstacle_pos = Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
         self.log.info("Found obstacle at {}".format(obstacle_pos))
