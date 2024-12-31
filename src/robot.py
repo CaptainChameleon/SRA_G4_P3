@@ -1,6 +1,9 @@
 import abc
+import csv
+import json
 import logging
 import math
+import os
 from configparser import ConfigParser
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
@@ -12,29 +15,30 @@ from utils import Vector
 
 class Robot:
 
-    def __init__(self, log,
-                 wheel_diameter: float, wheel_base: float,
-                 base_speed: float, speed_correction: float,
+    def __init__(self, log, wheel_diameter: float, wheel_base: float, base_left_speed: float, base_right_speed: float,
                  initial_theta: float):
+        # Robot components
         self.log = log
         self.sound = Sound()
         self.ultrasonic_sensor = UltrasonicSensor()
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_D)
+
+        # Physical parameters
         self.wheel_diameter = wheel_diameter
         self.wheel_base = wheel_base
-        self.base_speed = base_speed
-        self.speed_correction = speed_correction
-        self.base_left_speed = base_speed * speed_correction
-        self.base_right_speed = base_speed / speed_correction
-        self.pos = Vector(0, 0)
-        self.look_at = Vector(0, 1)
+        self.base_left_speed = base_left_speed
+        self.base_right_speed = base_right_speed
+
+        # Odometry parameters
         self.left_motor_dis = 0.0
         self.right_motor_dis = 0.0
+        self.pos = Vector(0, 0)
+        self.look_at = Vector(0, 1)
         self.theta = math.radians(initial_theta)
 
-    def beep(self, n=1):
-        for _ in range(n):
+    def beep(self, n_times=1):
+        for _ in range(n_times):
             self.sound.beep()
 
     def tachos_to_distance(self, tachos: int) -> float:
@@ -87,7 +91,7 @@ class Robot:
         self.log.info("Look-at Vector: {}".format(self.look_at))
 
     def move_straight(self, distance: float):
-        self.log.info("||> MOVING {} {:.4f} cm".format("FORWARD" if distance > 0 else "BACKWARD", distance))
+        self.log.info("\n||> MOVING {} {:.4f} cm".format("FORWARD" if distance > 0 else "BACKWARD", distance))
         degrees_to_turn = self.distance_to_tachos(distance)
         self.log.info("Target Tachos: {:.4f}".format(degrees_to_turn))
         self.left_motor.on_for_degrees(degrees=degrees_to_turn, speed=SpeedPercent(self.base_left_speed), brake=True,
@@ -96,10 +100,9 @@ class Robot:
                                         block=True)
         self.update_odometry()
         self.reset_motors()
-        self.log.info("\n")
 
-    def turn_degrees(self, degrees: float, speed=20):
-        self.log.info("||> ROTATING {:.4f} deg...".format(degrees))
+    def turn_degrees(self, degrees: float):
+        self.log.info("\n||> ROTATING {:.4f} deg...".format(degrees))
         wheel_degrees = self.rotation_to_wheel_degrees(degrees)
         self.log.info("Target Tachos: {:.4f}".format(wheel_degrees))
         self.left_motor.on_for_degrees(degrees=-wheel_degrees, speed=SpeedPercent(self.base_left_speed), brake=True,
@@ -108,10 +111,9 @@ class Robot:
                                         block=True)
         self.update_odometry()
         self.reset_motors()
-        self.log.info("\n")
 
     def run_forever(self):
-        self.log.info("||> MOVING IN A STRAIGHT LINE...")
+        self.log.info("\n||> MOVING IN A STRAIGHT LINE...")
         self.left_motor.speed_sp = int(self.base_left_speed / 100 * self.left_motor.max_speed)
         self.right_motor.speed_sp = int(self.base_right_speed / 100 * self.right_motor.max_speed)
         self.left_motor.run_forever()
@@ -119,7 +121,7 @@ class Robot:
 
     def turn_forever(self, center_of_rotation: Vector = None, clockwise: bool = False):
         self.log.info(
-            "||> ROTATING {}...".format("AROUND {}".format(center_of_rotation) if center_of_rotation else "IN PLACE")
+            "\n||> ROTATING {}...".format("AROUND {}".format(center_of_rotation) if center_of_rotation else "IN PLACE")
         )
         if center_of_rotation:
             distance_to_center = (center_of_rotation - self.pos).length
@@ -131,8 +133,8 @@ class Robot:
             left_radius = distance_to_center - (self.wheel_base / 2)
             right_radius = distance_to_center + (self.wheel_base / 2)
             speed_ratio = right_radius / left_radius
-            self.left_motor.speed_sp = int(self.base_speed * self.speed_correction)
-            self.right_motor.speed_sp = int(self.base_speed * speed_ratio / self.speed_correction)
+            # self.left_motor.speed_sp = int(self.base_speed * self.speed_correction)
+            # self.right_motor.speed_sp = int(self.base_speed * speed_ratio / self.speed_correction)
             self.left_motor.speed_sp = self.left_motor.speed_sp if clockwise else -self.left_motor.speed_sp
             self.right_motor.speed_sp = -self.right_motor.speed_sp if clockwise else self.right_motor.speed_sp
         else:
@@ -144,13 +146,11 @@ class Robot:
         self.right_motor.run_forever()
 
     def stop(self):
-        self.log.info("\n")
         self.log.info("||> STOP MOTORS".format(SpeedPercent(self.base_left_speed)))
         self.left_motor.stop()
         self.right_motor.stop()
         self.update_odometry()
         self.reset_motors()
-        self.log.info("\n")
 
 
 class RobotController(abc.ABC):
@@ -160,13 +160,13 @@ class RobotController(abc.ABC):
         logging.basicConfig(filename=log_path, filemode='w+', level=log_level)
         self.log = logging.getLogger('ev3dev')
         self.config = ConfigParser()
-        self.config.read("../config.ini")
+        self.config.read("/home/robot/SRA_G4_P3/config.ini")
         self.robot = Robot(
             self.log,
             self.config.getfloat("Base", "wheel_diameter"),
             self.config.getfloat("Base", "wheel_base"),
-            self.config.getfloat("Base", "base_speed"),
-            self.config.getfloat("Base", "speed_correction"),
+            self.config.getfloat("Base", "base_left_speed"),
+            self.config.getfloat("Base", "base_right_speed"),
             self.config.getfloat("Base", "initial_theta")
         )
 

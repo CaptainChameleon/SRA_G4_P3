@@ -1,0 +1,16 @@
+[Base]
+initial_theta = 90
+wheel_diameter = 5.4
+wheel_base = 13.5
+wheel_base_correction = 0.8764
+# 0.8764 * 1.0228
+# wheel_base_correction = 0.89638192
+base_speed = 20
+speed_correction = 1
+
+[Parking Control]
+search_cone = 60
+
+[Square Test Control]
+square_length = 50
+square_wait_time = 20
