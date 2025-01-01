@@ -42,18 +42,6 @@ class OdometricErrorClassifier:
                 error_present = True
         return error_present, angular_discrepancy, error_ratio
 
-    # def calculate_type_a_v2(self, cw_dist, ccw_dist):
-    #     """ Evalúa el error tipo A relacionado con la base incierta de distancia. """
-    #     error_present = False
-    #     angular_discrepancy = 0
-    #     error_ratio = 0
-    #     if cw_dist > 0 and ccw_dist > 0:
-    #         angular_discrepancy = ((cw_dist + ccw_dist) / (-4 * self.side_length)) * (180 / math.pi)
-    #         if angular_discrepancy < 0:
-    #             error_ratio = 90 / (90 - angular_discrepancy)
-    #             error_present = True
-    #     return error_present, angular_discrepancy, error_ratio
-
     def calculate_type_b(self, cw_dist, ccw_dist):
         """ Evalúa el error tipo B causado por diámetros de rueda desiguales. """
         error_present = False
@@ -87,29 +75,38 @@ class OdometricErrorClassifier:
         print(f'  Magnitud del Error (ED): {ed:.4f}')
         print(f'  Presencia: {"Detectado" if b_present else "No detectado"}')
         print('==================================\n')
-        
-    def generate_config(self):
-        wheel_diameter = self.WHEEL_DIAMETER
+
+    def _apply_corrections(self):
         wheel_base = self.INITIAL_WHEEL_BASE
         base_left_speed = self.BASE_SPEED
         base_right_speed = self.BASE_SPEED
-        print('==================================')
-        print('Generacion de configuracion')
-        print('==================================')
         for meassure_num, meassure in enumerate(self.meassures):
             cw_meassure, ccw_meassure = meassure
             type_a_is_present, type_a_ang_discrepancy, type_a_ratio = self.calculate_type_a(cw_meassure, ccw_meassure)
             type_b_is_present, type_b_ang_discrepancy, type_b_ratio = self.calculate_type_b(cw_meassure, ccw_meassure)
             if type_a_is_present:
                 wheel_base *= type_a_ratio
-                print('----------------------------------')
-                print(f'Meassure nº{meassure_num+1}: Corrected wheel base to {wheel_base:.4f} from {wheel_base/type_a_ratio:.4f} with ratio {type_a_ratio:.4f}')
-            if type_b_is_present:
+                print(f'Meassure nº{meassure_num + 1}:')
+                print(f'\tCorrected wheel base from {wheel_base / type_a_ratio:.4f} to {wheel_base:.4f} ')
+                print(f'\tError Ratio {type_a_ratio:.4f}')
+            elif type_b_is_present:
                 base_left_speed *= type_b_ratio
                 base_right_speed /= type_b_ratio
+                print(f'Meassure nº{meassure_num + 1}: ')
+                print(f'\tCorrected left_speed from {base_left_speed / type_b_ratio:.4f} to {base_left_speed:.4f}')
+                print(f'\tCorrected right_speed from {base_right_speed * type_b_ratio:.4f} to {base_right_speed:.4f}')
+                print(f'\tError Ratio {type_b_ratio:.4f}')
+            if meassure_num < len(self.meassures)-1:
                 print('----------------------------------')
-                print(f'Meassure nº{meassure_num + 1}: Corrected left_speed to {base_left_speed:.4f} from {base_left_speed / type_b_ratio:.4f} with ratio {type_b_ratio}:.4f')
         print('==================================')
+        return wheel_base, base_left_speed, base_right_speed
+        
+    def generate_config(self):
+        print('==================================')
+        print('Generating config file...')
+        print('==================================')
+        wheel_diameter = self.WHEEL_DIAMETER
+        wheel_base, base_left_speed, base_right_speed = self._apply_corrections()
         config = configparser.ConfigParser()
         config.read("../../config.ini")
         config["Base"]["wheel_diameter"] = str(wheel_diameter)
