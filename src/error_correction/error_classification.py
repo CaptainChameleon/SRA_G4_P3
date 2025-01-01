@@ -86,21 +86,30 @@ class OdometricErrorClassifier:
         print(f'  Discrepancia Angular (Beta): {beta:.4f} grados')
         print(f'  Magnitud del Error (ED): {ed:.4f}')
         print(f'  Presencia: {"Detectado" if b_present else "No detectado"}')
-        print('==================================')
+        print('==================================\n')
         
     def generate_config(self):
         wheel_diameter = self.WHEEL_DIAMETER
         wheel_base = self.INITIAL_WHEEL_BASE
         base_left_speed = self.BASE_SPEED
         base_right_speed = self.BASE_SPEED
-        for cw_meassure, ccw_meassure in self.meassures:
+        print('==================================')
+        print('Generacion de configuracion')
+        print('==================================')
+        for meassure_num, meassure in enumerate(self.meassures):
+            cw_meassure, ccw_meassure = meassure
             type_a_is_present, type_a_ang_discrepancy, type_a_ratio = self.calculate_type_a(cw_meassure, ccw_meassure)
             type_b_is_present, type_b_ang_discrepancy, type_b_ratio = self.calculate_type_b(cw_meassure, ccw_meassure)
             if type_a_is_present:
                 wheel_base *= type_a_ratio
+                print('----------------------------------')
+                print(f'Meassure nº{meassure_num+1}: Corrected wheel base to {wheel_base:.4f} from {wheel_base/type_a_ratio:.4f} with ratio {type_a_ratio:.4f}')
             if type_b_is_present:
                 base_left_speed *= type_b_ratio
                 base_right_speed /= type_b_ratio
+                print('----------------------------------')
+                print(f'Meassure nº{meassure_num + 1}: Corrected left_speed to {base_left_speed:.4f} from {base_left_speed / type_b_ratio:.4f} with ratio {type_b_ratio}:.4f')
+        print('==================================')
         config = configparser.ConfigParser()
         config.read("../../config.ini")
         config["Base"]["wheel_diameter"] = str(wheel_diameter)
