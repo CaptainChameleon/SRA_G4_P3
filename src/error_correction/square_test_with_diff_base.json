@@ -1,0 +1,11 @@
+{
+  "square_length": 50,
+  "wheel_diameter": 8.2,
+  "initial_wheel_base": 12.543358882994895,
+  "initial_left_speed": 20.04749338123254,
+  "initial_right_speed": 19.95261913264727,
+  "measurements": {
+    "clockwise":  [7.9, -1, 1.5, 1.5, 1.7],
+    "counter_clockwise": [8.0, -0.8, -0.5, -1, 3.2]
+  }
+}
