@@ -1,0 +1,14 @@
+[Base]
+initial_theta = 90
+wheel_diameter = 8.2
+wheel_base = 11.823492602615508
+base_left_speed = 20.05338097607363
+base_right_speed = 19.946761121092425
+
+[Parking Control]
+search_cone = 60
+
+[Square Test Control]
+square_length = 50
+square_wait_time = 20
+
