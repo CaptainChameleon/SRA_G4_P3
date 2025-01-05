@@ -4,10 +4,11 @@ import json
 import logging
 import math
 import os
+import time
 from configparser import ConfigParser
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
-from ev3dev2.sensor.lego import UltrasonicSensor
+from ev3dev2.sensor.lego import UltrasonicSensor, GyroSensor
 from ev3dev2.sound import Sound
 
 from utils import Vector
@@ -19,10 +20,11 @@ class Robot:
                  initial_theta: float):
         # Robot components
         self.log = log
-        self.sound = Sound()
-        self.ultrasonic_sensor = UltrasonicSensor()
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_D)
+        self.ultrasonic_sensor = UltrasonicSensor()
+        self.gyroscope = GyroSensor()
+        self.sound = Sound()
 
         # Physical parameters
         self.wheel_diameter = wheel_diameter
@@ -37,9 +39,11 @@ class Robot:
         self.look_at = Vector(0, 1)
         self.theta = math.radians(initial_theta)
 
-    def beep(self, n_times=1):
+    def beep(self, n_times=1, delay=0):
         for _ in range(n_times):
             self.sound.beep()
+            if delay:
+                time.sleep(delay)
 
     def tachos_to_distance(self, tachos: int) -> float:
         return (tachos / 360) * math.pi * self.wheel_diameter
