@@ -22,13 +22,13 @@ class SquareTestController(RobotController):
         self.wait(duration=wait_time)
         self.make_square(side_len=square_size, clockwise=False)
 
-    def ultrasonic_test(self, stop_distance: float = 10):
+    def ultrasonic_test(self, stop_distance: float = 10, times = 0):
         # MOVE UNTIL DISTANCE IS REACHED TEST
         self.robot.run_forever()
         while self.robot.ultrasonic_sensor.distance_centimeters > stop_distance:
-            self.log.info("Detected obstacle at {} cm".format(self.robot.ultrasonic_sensor.distance_centimeters))
+            self.log.info("Detected obstacle {} at {} cm".format(times, self.robot.ultrasonic_sensor.distance_centimeters))
         self.robot.stop()
-        self.log.info("Stopped at {} cm from obstacle".format(self.robot.ultrasonic_sensor.distance_centimeters))
+        self.log.info("Stopped at {} cm from obstacle {}".format(self.robot.ultrasonic_sensor.distance_centimeters, times))
 
         # MOVE TO CERTAIN DISTANCE TEST
         # distance_to_obs = self.robot.ultrasonic_sensor.distance_centimeters
@@ -41,26 +41,30 @@ class SquareTestController(RobotController):
         # self.robot.beep(n_times=2)
         # self.log.info("Detected obstacle at {} cm".format(self.robot.ultrasonic_sensor.distance_centimeters))
 
-    def gyroscope_test(self, degrees: float = 90):
+    '''def gyroscope_test(self, degrees: float = 90):
         self.robot.gyroscope.reset()
         initial_theta = self.robot.gyroscope.angle
         self.robot.turn_degrees(degrees)
-        self.log.info("Rotated from {} deg to {} deg".format(initial_theta, self.robot.gyroscope.angle))
+        self.log.info("Rotated from {} deg to {} deg".format(initial_theta, self.robot.gyroscope.angle))'''
 
     def move(self):
         # A) Make a square
         # self.robot.move_straight(50)
         # B)
         # for _ in range(10):
-        #     self.bidirectional_square_test(wait_time=20)
+           # self.bidirectional_square_test(wait_time=20)
         # C) Determinar si existe error sistemático.
         # D) Forzar la aparición de error sistemático y comprobar si el test aplica las correcciones adecuadas.
         # E) Construir una plataforma diferencial con una geometría diferente y comparar y justificar los resultados.
-        self.make_square(clockwise=True)
+        # self.make_square(clockwise=True)
 
         # F) Caracterización del error de otros sensores: ultrasonidos, orientación
-        self.ultrasonic_test(stop_distance=10)
-        self.gyroscope_test(degrees=90)
+        times = 0
+        while times < 10:
+            self.ultrasonic_test(stop_distance=10, times=times)
+            self.wait(duration=20)
+            times += 1
+        # self.gyroscope_test(degrees=90)
 
 
 if __name__ == '__main__':

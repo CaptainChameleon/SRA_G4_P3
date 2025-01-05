@@ -8,7 +8,7 @@ import time
 from configparser import ConfigParser
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
-from ev3dev2.sensor.lego import UltrasonicSensor, GyroSensor
+from ev3dev2.sensor.lego import UltrasonicSensor
 from ev3dev2.sound import Sound
 
 from utils import Vector
@@ -23,7 +23,7 @@ class Robot:
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_D)
         self.ultrasonic_sensor = UltrasonicSensor()
-        self.gyroscope = GyroSensor()
+        # self.gyroscope = GyroSensor()
         self.sound = Sound()
 
         # Physical parameters
