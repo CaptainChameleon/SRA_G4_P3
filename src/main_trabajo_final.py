@@ -65,8 +65,11 @@ class ParkingController(RobotController):
         self.log.debug("Target Scan Pos: {}".format(target_scan_pos))
         self.log.debug("Target Robot Pos: {}".format(self.robot.pos))
         target_scan_angle = self.robot.look_at.angle_with(target_scan_pos)
+        self.log.debug("Target Scan Angle: {}".format(target_scan_angle))
         self.robot.turn_degrees(-target_scan_angle)
-        self.robot.move_straight(math.sqrt(sec_dis ** 2 + self.obstacle_pos_1.y ** 2))
+        distance_to_advance = math.sqrt(sec_dis ** 2 + self.obstacle_pos_1.y ** 2)
+        self.log.debug("Distance to scan pos: {}".format(distance_to_advance))
+        self.robot.move_straight(distance_to_advance)
         self.robot.turn_degrees(target_scan_angle + math.pi / 2)
         right_cone_limit = self._scan_until_not_detected(self.robot.theta, sec_dis, clockwise=True, restore=False)
 
