@@ -27,6 +27,7 @@ class Vector:
 
     def angle_with(self, other):
         return math.asin(self.cross(other) / (self.length * other.length))
+
     
     def rotate(self, angle):
         radians = math.radians(angle)

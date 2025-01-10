@@ -62,7 +62,9 @@ class ParkingController(RobotController):
         # time.sleep(20)
         sec_dis = 20
         target_scan_pos = Vector(sec_dis, self.obstacle_pos_1.y)
-        target_scan_angle = self.robot.pos.angle_with(target_scan_pos)
+        self.log.debug("Target Scan Pos: {}".format(target_scan_pos))
+        self.log.debug("Target Robot Pos: {}".format(self.robot.pos))
+        target_scan_angle = self.robot.look_at.angle_with(target_scan_pos)
         self.robot.turn_degrees(-target_scan_angle)
         self.robot.move_straight(math.sqrt(sec_dis ** 2 + self.obstacle_pos_1.y ** 2))
         self.robot.turn_degrees(target_scan_angle + math.pi / 2)
