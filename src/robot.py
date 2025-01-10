@@ -82,8 +82,8 @@ class Robot:
         self.theta %= (2 * math.pi)  # Keep theta within [0, 2*pi]
 
         # Update position
-        self.pos.x += d_center * math.sin(self.theta)
-        self.pos.y += d_center * math.cos(self.theta)
+        self.pos.y += d_center * math.sin(self.theta)
+        self.pos.x += d_center * math.cos(self.theta)
 
         # Update look_at vector
         self.look_at.x = math.sin(self.theta)
@@ -130,17 +130,24 @@ class Robot:
         if center_of_rotation:
             distance_to_center = (center_of_rotation - self.pos).length
             robot_cor_angle = math.degrees(
-                math.acos(center_of_rotation.dot(self.look_at) / center_of_rotation.length * self.look_at.length)
+                (center_of_rotation.dot(self.look_at) / (center_of_rotation.length * self.look_at.length))
             )
             if robot_cor_angle != 90:
                 self.turn_degrees(90 - robot_cor_angle)
-            left_radius = distance_to_center - (self.wheel_base / 2)
-            right_radius = distance_to_center + (self.wheel_base / 2)
+            left_radius = (distance_to_center * 2) - (self.wheel_base / 2)
+            #left_radius = ((distance_to_center + self.wheel_base) * 2)
+            #right_radius = (distance_to_center * 2)
+            right_radius = (distance_to_center * 2) + (self.wheel_base / 2)
             speed_ratio = right_radius / left_radius
-            # self.left_motor.speed_sp = int(self.base_speed * self.speed_correction)
-            # self.right_motor.speed_sp = int(self.base_speed * speed_ratio / self.speed_correction)
-            self.left_motor.speed_sp = self.left_motor.speed_sp if clockwise else -self.left_motor.speed_sp
-            self.right_motor.speed_sp = -self.right_motor.speed_sp if clockwise else self.right_motor.speed_sp
+            self.log.debug("Speed ratio: {}".format(speed_ratio))
+            self.log.debug("Distance to center: {}".format(distance_to_center))
+            self.left_motor.speed_sp = int((self.base_left_speed * speed_ratio) / 100 * self.left_motor.max_speed)
+            self.right_motor.speed_sp = int((self.base_right_speed / speed_ratio) / 100 * self.right_motor.max_speed)
+            self.log.debug("Motor Speed Left Fixed: {}".format(self.left_motor.speed_sp))
+            self.log.debug("Motor Speed Right Fixed: {}".format(self.right_motor.speed_sp))
+            self.log.debug("Motor Speed Right: {}".format(int((self.base_right_speed / speed_ratio) / 100 * self.right_motor.max_speed)))
+            # self.left_motor.speed_sp = self.left_motor.speed_sp if clockwise else -self.left_motor.speed_sp
+            # self.right_motor.speed_sp = -self.right_motor.speed_sp if clockwise else self.right_motor.speed_sp
         else:
             self.left_motor.speed_sp = int(self.base_left_speed / 100 * self.left_motor.max_speed)
             self.right_motor.speed_sp = int(self.base_right_speed / 100 * self.right_motor.max_speed)
@@ -148,6 +155,7 @@ class Robot:
             self.right_motor.speed_sp = -self.right_motor.speed_sp if clockwise else self.right_motor.speed_sp
         self.left_motor.run_forever()
         self.right_motor.run_forever()
+
 
     def stop(self):
         self.log.info("||> STOP MOTORS".format(SpeedPercent(self.base_left_speed)))

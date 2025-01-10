@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import math
+import time
 
 from robot import RobotController
 from utils import Vector
@@ -12,12 +13,13 @@ class ParkingController(RobotController):
         super().__init__(log_name, log_level)
         self.obstacle_pos_1 = None
         self.obstacle_pos_2 = None
+        self.initial_theta = None
     
     def search_for_first_obstacle(self):
-        initial_theta = self.robot.theta
+        self.initial_theta = self.robot.theta
         search_cone_angle = math.radians(60)
-        search_max_theta = initial_theta + search_cone_angle
-        search_min_theta = initial_theta - search_cone_angle
+        search_max_theta = self.initial_theta + search_cone_angle
+        search_min_theta = self.initial_theta - search_cone_angle
 
         self.log.info("||> SEARCHING FOR FIRST OBSTACLE [SEARCH CONE: {:.4f} deg]".format(
             2 * math.degrees(search_cone_angle))
@@ -47,9 +49,56 @@ class ParkingController(RobotController):
         self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
         self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
         self.obstacle_pos_1 = self.scan_obstacle(min_dis)
+        self.log.info("Final theta sign {}".format(math.degrees(self.robot.theta - self.initial_theta)))
 
     def search_for_second_obstacle(self):
+        distance_to_center = (self.obstacle_pos_1 - self.robot.pos).length
+        security_dis = 20
+        self.robot.move_straight(distance_to_center - security_dis)
         self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
+        time.sleep(40)
+
+    def xd(self):
+        sign = self.robot.theta - self.initial_theta
+
+        # Determina el sentido del giro
+        clockwise = sign >= 0
+
+        security_dis = 20
+        min_dis = 15  # Distancia mínima segura
+        target_distance = 30  # Distancia objetivo para iniciar ajustes
+        max_rotation_speed = 50  # Velocidad máxima de rotación
+        max_rotation_angle = 45  # Máximos grados de giro por iteración
+
+        while True:
+            self.robot.update_odometry()
+            current_dis = self.robot.ultrasonic_sensor.distance_centimeters
+
+            if current_dis > target_distance:
+                self.robot.move_straight((current_dis - target_distance) + 1)
+
+            # Si el obstáculo sigue en rango, ajusta el giro
+            if current_dis <= target_distance:
+                rotation_factor = max(0.2, (target_distance - current_dis) / target_distance)
+                rotation_angle = int(max_rotation_angle * rotation_factor)
+
+                # Aumentar grados sin perder el obstáculo de vista
+                if clockwise:
+                    self.robot.left_motor.speed_sp = rotation_angle
+                    self.robot.right_motor.speed_sp = -rotation_angle
+                else:
+                    self.robot.left_motor.speed_sp = -rotation_angle
+                    self.robot.right_motor.speed_sp = rotation_angle
+
+                self.log.debug("Rotating with angle: {} degrees (factor: {:.2f})".format(rotation_angle, rotation_factor))
+                self.robot.left_motor.run_forever()
+                self.robot.right_motor.run_forever()
+
+            # Detiene el movimiento si se alcanza la distancia mínima segura
+            if current_dis < min_dis:
+                self.robot.stop()
+                self.log.info("Stopped at distance: {:.2f} cm".format(current_dis))
+                break
 
     def _scan_until_not_detected(self, initial_theta: float, obstacle_dis: float, clockwise: bool) -> float:
         current_dis = obstacle_dis
@@ -72,7 +121,6 @@ class ParkingController(RobotController):
         initial_theta = self.robot.theta
         mediatriz_izq = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=False)
         mediatriz_der = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=True)
-        self.robot.turn_degrees(math.degrees(initial_theta-mediatriz_der))
         self.robot.pos = Vector(0, 0)
         beta = mediatriz_izq - (mediatriz_izq - mediatriz_der) / 2
         obstacle_pos = Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
@@ -81,9 +129,12 @@ class ParkingController(RobotController):
 
     def move(self):
         self.search_for_first_obstacle()
-        self.search_for_second_obstacle()
+        self.xd()
+        #self.search_for_second_obstacle()
 
 
 if __name__ == '__main__':
     robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final")
+    robot_controller.robot.base_left_speed = 10 * 1.0023746690616273
+    robot_controller.robot.base_right_speed = 10 * 0.9976309566323637
     robot_controller.run()
