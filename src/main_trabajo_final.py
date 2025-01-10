@@ -14,7 +14,7 @@ class ParkingController(RobotController):
         self.obstacle_pos_1 = None
         self.obstacle_pos_2 = None
         self.initial_theta = None
-    
+
     def search_for_first_obstacle(self):
         self.initial_theta = self.robot.theta
         search_cone_angle = math.radians(60)
@@ -48,15 +48,25 @@ class ParkingController(RobotController):
         )
         self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
         self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
-        self.obstacle_pos_1 = self.scan_obstacle(min_dis)
-        self.log.info("Final theta sign {}".format(math.degrees(self.robot.theta - self.initial_theta)))
+        # self.obstacle_pos_1 = self.scan_obstacle(min_dis)
+        self.obstacle_pos_1 = Vector(0, min_dis)
+        self.robot.pos = Vector(0, 0)
+        self.robot.look_at = Vector(0, 1)
+        self.robot.theta = math.pi / 2
 
     def search_for_second_obstacle(self):
-        distance_to_center = (self.obstacle_pos_1 - self.robot.pos).length
-        security_dis = 20
-        self.robot.move_straight(distance_to_center - security_dis)
-        self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
-        time.sleep(40)
+        # distance_to_center = (self.obstacle_pos_1 - self.robot.pos).length
+        # security_dis = 15
+        # self.robot.move_straight(distance_to_center - security_dis)
+        # self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
+        # time.sleep(20)
+        sec_dis = 20
+        target_scan_pos = Vector(sec_dis, self.obstacle_pos_1.y)
+        target_scan_angle = self.robot.pos.angle_with(target_scan_pos)
+        self.robot.turn_degrees(-target_scan_angle)
+        self.robot.move_straight(math.sqrt(sec_dis ** 2 + self.obstacle_pos_1.y ** 2))
+        self.robot.turn_degrees(target_scan_angle + math.pi / 2)
+        right_cone_limit = self._scan_until_not_detected(self.robot.theta, sec_dis, clockwise=True, restore=False)
 
     def xd(self):
         sign = self.robot.theta - self.initial_theta
@@ -100,7 +110,7 @@ class ParkingController(RobotController):
                 self.log.info("Stopped at distance: {:.2f} cm".format(current_dis))
                 break
 
-    def _scan_until_not_detected(self, initial_theta: float, obstacle_dis: float, clockwise: bool) -> float:
+    def _scan_until_not_detected(self, initial_theta: float, obstacle_dis: float, clockwise: bool, restore: bool = True) -> float:
         current_dis = obstacle_dis
 
         # Scan until obstacle is no longer detected
@@ -112,9 +122,11 @@ class ParkingController(RobotController):
         self.robot.stop()
         theta_limit = self.robot.theta
 
+        self.log.debug("Found obstacle, turned {}".format(theta_limit))
         # Restore theta & return
-        self.robot.turn_degrees(math.degrees(initial_theta - theta_limit))
-        self.log.debug("Found obstacle, turned {} and turning back to initial theta".format(theta_limit))
+        if restore:
+            self.log.info("Turning back to initial theta...")
+            self.robot.turn_degrees(math.degrees(initial_theta - theta_limit))
         return theta_limit
 
     def scan_obstacle(self, obstacle_dis) -> Vector:
@@ -129,12 +141,11 @@ class ParkingController(RobotController):
 
     def move(self):
         self.search_for_first_obstacle()
-        self.xd()
-        #self.search_for_second_obstacle()
+        self.search_for_second_obstacle()
 
 
 if __name__ == '__main__':
-    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final")
+    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.DEBUG)
     robot_controller.robot.base_left_speed = 10 * 1.0023746690616273
     robot_controller.robot.base_right_speed = 10 * 0.9976309566323637
     robot_controller.run()
