@@ -80,24 +80,33 @@ class OdometricErrorClassifier:
         wheel_base = self.initial_wheel_base
         base_left_speed = self.initial_left_speed
         base_right_speed = self.initial_right_speed
+        base_ratio = 1.0
+        base_left_speed_ratio = 1.0
+        base_right_speed_ratio = 1.0
         for measure_num, meassure in enumerate(self.measurements):
             cw_measure, ccw_measure = meassure
             type_a_is_present, type_a_ang_discrepancy, type_a_ratio = self.calculate_type_a(cw_measure, ccw_measure)
             type_b_is_present, type_b_ang_discrepancy, type_b_ratio = self.calculate_type_b(cw_measure, ccw_measure)
             if type_a_is_present:
                 wheel_base *= type_a_ratio
+                base_ratio *= type_a_ratio
                 print(f'Measure nº{measure_num + 1}:')
                 print(f'\tCorrected wheel base from {wheel_base / type_a_ratio:.4f} to {wheel_base:.4f} ')
                 print(f'\tError Ratio {type_a_ratio:.4f}')
             elif type_b_is_present:
                 base_left_speed *= type_b_ratio
                 base_right_speed /= type_b_ratio
+                base_left_speed_ratio *= type_b_ratio
+                base_right_speed_ratio /= type_b_ratio
                 print(f'Measure nº{measure_num + 1}: ')
                 print(f'\tCorrected left_speed from {base_left_speed / type_b_ratio:.4f} to {base_left_speed:.4f}')
                 print(f'\tCorrected right_speed from {base_right_speed * type_b_ratio:.4f} to {base_right_speed:.4f}')
                 print(f'\tError Ratio {type_b_ratio:.4f}')
             if measure_num < len(self.measurements)-1:
                 print('----------------------------------')
+        print(f'Accumulated base ratio: {base_ratio}')
+        print(f'Accumulated left speed ratio: {base_left_speed_ratio}')
+        print(f'Accumulated right speed ratio: {base_right_speed_ratio}')
         print('==================================')
         return wheel_base, base_left_speed, base_right_speed
         
@@ -117,9 +126,9 @@ class OdometricErrorClassifier:
 
 
 if __name__ == '__main__':
-    # measures = os.path.join(os.path.dirname(__file__), "square_test.json")
+    measures = os.path.join(os.path.dirname(__file__), "square_test.json")
     # measures = os.path.join(os.path.dirname(__file__), "square_test_with_error.json")
-    measures = os.path.join(os.path.dirname(__file__), "square_test_with_diff_base.json")
+    # measures = os.path.join(os.path.dirname(__file__), "square_test_with_diff_base.json")
     error_classifier = OdometricErrorClassifier(measures)
     error_classifier.report_errors_from_last_measure()
     error_classifier.generate_config()
