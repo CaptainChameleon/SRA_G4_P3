@@ -22,6 +22,12 @@ class Vector:
         else:
             raise ValueError("Ambos operandos deben ser vectores.")
 
+    def cross(self, other):
+        return self.x * other.y - self.y * other.x
+
+    def angle_with(self, other):
+        return math.asin(self.cross(other) / (self.length * other.length))
+    
     def rotate(self, angle):
         radians = math.radians(angle)
         cos_theta = math.cos(radians)
