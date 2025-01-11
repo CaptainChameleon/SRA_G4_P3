@@ -61,7 +61,6 @@ class ParkingController(RobotController):
         # self.robot.move_straight(distance_to_center - security_dis)
         # self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
         # time.sleep(20)
-        initial_pos = Vector(self.robot.pos.x, self.robot.pos.y)
 
         # Position robot
         sec_dis = 20
@@ -69,9 +68,10 @@ class ParkingController(RobotController):
         while self.robot.ultrasonic_sensor.distance_centimeters > sec_dis:
             self.robot.update_odometry()
         self.robot.stop()
+        initial_pos = Vector(self.robot.pos.x, self.robot.pos.y)
 
         # Rotate robot
-        self._scan_until_not_detected(self.robot.theta, self.first_obstacle_pos.length, clockwise=False, restore=False)
+        obs_angle_limit = self._scan_until_not_detected(self.robot.theta, self.first_obstacle_pos.length, clockwise=False, restore=False)
         wheel_pos = self.robot.look_at.rotate(-90).to_length(self.robot.wheel_base/2)
         right_wheel_ray = wheel_pos + self.robot.look_at.to_length(self.robot.ultrasonic_sensor.distance_centimeters)
         correction_angle = math.degrees(right_wheel_ray.angle_with(self.robot.look_at))
@@ -95,7 +95,7 @@ class ParkingController(RobotController):
                 self.robot.stop()
                 backwards_dis = (self.robot.pos - initial_pos).length
                 self.robot.move_straight(-backwards_dis)
-                self.robot.turn_degrees(-correction_angle)
+                self.robot.turn_degrees(-correction_angle-obs_angle_limit)
                 break
                 # TODO: Controlar caso segun se este por encima o por debajo de la primera lata
         self.robot.stop()
