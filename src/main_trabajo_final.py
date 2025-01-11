@@ -12,7 +12,7 @@ class ParkingController(RobotController):
     def __init__(self, log_name: str, log_level: int = logging.DEBUG):
         super().__init__(log_name, log_level)
         self.first_obstacle_pos = None
-        self.obstacle_pos_2 = None
+        self.second_obstacle_pos = None
         self.initial_theta = None
 
     def update_map(self, obstacle_dis_upfront):
@@ -51,6 +51,7 @@ class ParkingController(RobotController):
         )
         self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
         self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
+        self.robot.pos = Vector(0, 0)
         self.first_obstacle_pos = self.scan_obstacle(min_dis)
 
     def search_for_second_obstacle(self):
@@ -60,6 +61,7 @@ class ParkingController(RobotController):
         # self.robot.move_straight(distance_to_center - security_dis)
         # self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
         # time.sleep(20)
+        sensor_color = False
 
         self._scan_until_not_detected(self.robot.theta, self.first_obstacle_pos.length, clockwise=False, restore=False)
         self.robot.run_forever()
@@ -67,9 +69,13 @@ class ParkingController(RobotController):
             self.robot.update_odometry()
             if self.robot.pos.y > self.first_obstacle_pos.y:
                 current_obs_dis = self.robot.ultrasonic_sensor.distance_centimeters
-                if current_obs_dis <= 20:
+                if current_obs_dis <= 40:
+                    self.robot.stop()
+                    self.second_obstacle_pos = self.scan_obstacle(current_obs_dis)
                     break
-        self.robot.stop()
+            if sensor_color:
+                self.robot.stop()
+                # TODO: Controlar caso segun se este por encima o por debajo de la primera lata
 
     def xd(self):
         sign = self.robot.theta - self.initial_theta
@@ -136,9 +142,8 @@ class ParkingController(RobotController):
         initial_theta = self.robot.theta
         mediatriz_izq = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=False)
         mediatriz_der = self._scan_until_not_detected(initial_theta, obstacle_dis, clockwise=True)
-        self.robot.pos = Vector(0, 0)
         beta = mediatriz_izq - (mediatriz_izq - mediatriz_der) / 2
-        obstacle_pos = Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
+        obstacle_pos = Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta)) + self.robot.pos
         self.log.info("Found obstacle at {}".format(obstacle_pos))
         return obstacle_pos
 
