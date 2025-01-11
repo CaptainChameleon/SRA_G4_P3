@@ -15,6 +15,9 @@ class ParkingController(RobotController):
         self.obstacle_pos_2 = None
         self.initial_theta = None
 
+    def update_map(self, obstacle_dis_upfront):
+        pass
+
     def search_for_first_obstacle(self):
         self.initial_theta = self.robot.theta
         search_cone_angle = math.radians(60)
@@ -55,14 +58,14 @@ class ParkingController(RobotController):
         self.robot.theta = math.pi / 2
 
     def search_for_second_obstacle(self):
-
         self.log.info("||> SEARCHING FOR SECOND OBSTACLE")
-
         # distance_to_center = (self.obstacle_pos_1 - self.robot.pos).length
         # security_dis = 15
         # self.robot.move_straight(distance_to_center - security_dis)
         # self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
         # time.sleep(20)
+
+        # Position robot for scan
         sec_dis = 20
         target_scan_pos = Vector(sec_dis, self.obstacle_pos_1.y)
         self.log.debug("Target Scan Pos: {}".format(target_scan_pos))
@@ -73,9 +76,40 @@ class ParkingController(RobotController):
         distance_to_advance = math.sqrt(sec_dis ** 2 + self.obstacle_pos_1.y ** 2)
         self.log.debug("Distance to scan pos: {}".format(distance_to_advance))
         self.robot.move_straight(distance_to_advance)
-        self.robot.turn_degrees(-target_scan_angle + 90)
+        self.robot.turn_degrees(target_scan_angle + 90)
+
+        # Scan for 2nd obstacle
         right_cone_limit = self._scan_until_not_detected(self.robot.theta, sec_dis, clockwise=True, restore=False)
-        self.log.debug("Right Cone Limit: {}".format(right_cone_limit))
+        self.log.debug(right_cone_limit)
+        search_cone_angle = math.radians(180)
+        search_max_theta = self.initial_theta + search_cone_angle
+        search_min_theta = right_cone_limit
+
+        self.log.info("||> SEARCHING FOR SECOND OBSTACLE [SEARCH CONE: {:.4f} deg]".format(
+            math.degrees(search_cone_angle))
+        )
+        min_dis_angle = self.robot.theta
+        min_dis = self.robot.ultrasonic_sensor.distance_centimeters
+        self.log.debug("Initial distance: {:.4f} {:.4f}".format(min_dis, min_dis_angle))
+
+        self.robot.turn_forever(clockwise=True)
+        while 0.7 * search_min_theta <= self.robot.theta <= 1.3 * search_max_theta:
+            self.robot.update_odometry()
+            self.log.debug("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(
+                math.degrees(self.robot.theta), math.degrees(search_min_theta))
+            )
+            current_dis = self.robot.ultrasonic_sensor.distance_centimeters
+            current_theta = self.robot.theta
+            self.log.debug("Current obs dis: {:.2f}\n".format(current_dis))
+            if current_dis < min_dis:
+                min_dis = current_dis
+                min_dis_angle = current_theta
+        self.robot.stop()
+        self.log.info("Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(
+            min_dis, math.degrees(min_dis_angle))
+        )
+        self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
+        self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
 
     def xd(self):
         sign = self.robot.theta - self.initial_theta
