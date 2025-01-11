@@ -16,6 +16,10 @@ class Vector:
     def length(self):
         return math.sqrt(self.x**2 + self.y**2)
 
+    def to_length(self, new_length):
+        b = math.sqrt(new_length**2 / (self.x**2 + self.y**2))
+        return Vector(b * self.x, b * self.y)
+
     def dot(self, other):
         if isinstance(other, Vector):
             return self.x * other.x + self.y * other.y
@@ -28,7 +32,6 @@ class Vector:
     def angle_with(self, other):
         return math.asin(self.cross(other) / (self.length * other.length))
 
-    
     def rotate(self, angle):
         radians = math.radians(angle)
         cos_theta = math.cos(radians)
