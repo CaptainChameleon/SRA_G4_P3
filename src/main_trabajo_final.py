@@ -11,7 +11,7 @@ class ParkingController(RobotController):
     
     def __init__(self, log_name: str, log_level: int = logging.DEBUG):
         super().__init__(log_name, log_level)
-        self.obstacle_pos_1 = None
+        self.first_obstacle_pos = None
         self.obstacle_pos_2 = None
         self.initial_theta = None
 
@@ -51,7 +51,7 @@ class ParkingController(RobotController):
         )
         self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.robot.theta)))
         self.robot.turn_degrees(math.degrees(min_dis_angle - self.robot.theta))
-        self.obstacle_pos_1 = self.scan_obstacle(min_dis)
+        self.first_obstacle_pos = self.scan_obstacle(min_dis)
 
     def search_for_second_obstacle(self):
         self.log.info("||> SEARCHING FOR SECOND OBSTACLE")
@@ -61,9 +61,15 @@ class ParkingController(RobotController):
         # self.robot.turn_forever(center_of_rotation=self.obstacle_pos_1, clockwise=True)
         # time.sleep(20)
 
-        self._scan_until_not_detected(self.robot.theta, self.obstacle_pos_1.length, clockwise=False, restore=False)
+        self._scan_until_not_detected(self.robot.theta, self.first_obstacle_pos.length, clockwise=False, restore=False)
         self.robot.run_forever()
-
+        while True:
+            self.robot.update_odometry()
+            if self.robot.pos.y > self.first_obstacle_pos.y:
+                current_obs_dis = self.robot.ultrasonic_sensor.distance_centimeters
+                if current_obs_dis <= 40:
+                    break
+        self.robot.stop()
 
     def xd(self):
         sign = self.robot.theta - self.initial_theta
