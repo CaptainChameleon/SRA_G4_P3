@@ -67,7 +67,7 @@ class ParkingController(RobotController):
             self.robot.update_odometry()
             if self.robot.pos.y > self.first_obstacle_pos.y:
                 current_obs_dis = self.robot.ultrasonic_sensor.distance_centimeters
-                if current_obs_dis <= 40:
+                if current_obs_dis <= 20:
                     break
         self.robot.stop()
 
