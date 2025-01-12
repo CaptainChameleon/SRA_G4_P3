@@ -83,25 +83,33 @@ class ParkingController(RobotController):
 
         # Look for second obstacle
         sensor_color = False
+        color_umbral = 20
         self.robot.run_forever()
         while True:
             self.robot.update_odometry()
             if self.robot.pos.y > self.first_obstacle_pos.y:
                 current_obs_dis = self.robot.ultrasonic_sensor.distance_centimeters
                 if current_obs_dis <= 20:
-                    """self.robot.stop()
-                    self.second_obstacle_pos = self.scan_obstacle(current_obs_dis)
+                    self.robot.stop()
+                    """self.second_obstacle_pos = self.scan_obstacle(current_obs_dis)
                     self.log.info("Found first obstacle at {}".format(self.first_obstacle_pos))
                     self.log.info("Found second obstacle at {}".format(self.second_obstacle_pos))"""
                     break
-                sensor_color = True
+                reflectivity = self.robot.color_sensor.reflected_light_intensity
+                self.log.debug("Reflectivity: {}".format(reflectivity))
+                if reflectivity < color_umbral:
+                    sensor_color = True
             if sensor_color:
                 self.robot.stop()
                 backwards_dis = (self.robot.pos - initial_pos).length
                 self.robot.move_straight(-backwards_dis)
                 back_correction_angle = math.degrees(initial_theta) - obs_angle_limit 
                 self.robot.turn_degrees(back_correction_angle)
-                break
+                self.robot.turn_degrees(-correction_angle)
+                sensor_color = False
+
+                self.robot.run_forever()
+
                 # TODO: Controlar caso segun se este por encima o por debajo de la primera lata
         self.robot.stop()
 

@@ -10,6 +10,8 @@ from configparser import ConfigParser
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
 from ev3dev2.sensor.lego import UltrasonicSensor
 from ev3dev2.sound import Sound
+from ev3dev2.sensor.lego import ColorSensor
+from ev3dev2.sensor import INPUT_3
 
 from utils import Vector
 
@@ -23,6 +25,8 @@ class Robot:
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_D)
         self.ultrasonic_sensor = UltrasonicSensor()
+        self.color_sensor = ColorSensor(INPUT_3)
+        self.color_sensor.mode = 'COL-COLOR'
         # self.gyroscope = GyroSensor()
         self.sound = Sound()
 
