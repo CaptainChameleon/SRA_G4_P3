@@ -2,6 +2,13 @@ import math
 
 
 class Vector:
+
+    @staticmethod
+    def middle_of(vector_a, vector_b):
+        middle = vector_b - vector_a
+        middle = middle.to_length(middle.length / 2)
+        return vector_a + middle
+
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
@@ -29,13 +36,18 @@ class Vector:
     def cross(self, other):
         return self.x * other.y - self.y * other.x
 
-    def angle_with(self, other):
-        return math.asin(self.cross(other) / (self.length * other.length))
+    def angle_with(self, other, in_degrees: bool = False):
+        angle = math.asin(self.cross(other) / (self.length * other.length))
+        if in_degrees:
+            return math.degrees(angle)
+        return angle
 
-    def rotate(self, angle):
-        radians = math.radians(angle)
-        cos_theta = math.cos(radians)
-        sin_theta = math.sin(radians)
+    def rotate_degrees(self, angle):
+        return self.rotate_radians(math.radians(angle))
+
+    def rotate_radians(self, angle):
+        cos_theta = math.cos(angle)
+        sin_theta = math.sin(angle)
         new_x = self.x * cos_theta - self.y * sin_theta
         new_y = self.x * sin_theta + self.y * cos_theta
 
@@ -49,6 +61,6 @@ class Vector:
 
 if __name__ == "__main__":
     vector1 = Vector(0, 1)
-    rotated_vector = vector1.rotate(90)
+    rotated_vector = vector1.rotate_degrees(90)
     print("Vector original:", vector1)
     print("Vector rotado:", rotated_vector)
