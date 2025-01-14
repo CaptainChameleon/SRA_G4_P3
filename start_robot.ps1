@@ -48,8 +48,8 @@ if (-not $single_commands -or ($single_commands -and $Run))
 {
     # LAUNCH SCRIPT WITHIN EV3DEV
     Write-Host "Launching EV3DEV program..." -ForegroundColor Green
-    plink -batch -ssh robot@ev3dev -pw $password "python3 /home/robot/SRA_G4_P3/src/main_p3.py"
-    # plink -batch -ssh robot@ev3dev -pw $password "python3 /home/robot/SRA_G4_P3/src/main_trabajo_final.py"
+    # plink -batch -ssh robot@ev3dev -pw $password "python3 /home/robot/SRA_G4_P3/src/main_p3.py"
+    plink -batch -ssh robot@ev3dev -pw $password "python3 /home/robot/SRA_G4_P3/src/main_trabajo_final.py"
 }
 if (-not $single_commands -or ($single_commands -and $Logs))
 {
