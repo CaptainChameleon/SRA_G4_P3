@@ -256,7 +256,7 @@ class Robot:
         if max_range:
             self.log.debug("Search range: {} cm".format(max_range))
         initial_speed = self.speed
-        self.speed = 4
+        self.speed = 8
         initial_theta = self.theta
         search_cone_half_radians = math.radians(search_cone_degrees / 2)
         search_max_theta = initial_theta + search_cone_half_radians
@@ -302,6 +302,52 @@ class Robot:
         obstacle_pos = self.pos + Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
         self.log.info("Found obstacle at {}".format(obstacle_pos))
         return obstacle_pos
+    
+
+
+    def scan_for_second_closest_obstacle(self, search_cone_degrees: float = 120, max_range: float = None, restore: bool = True) -> None or Tuple[float, float]:
+        self.log.info("\n||> SEARCHING FOR SECOND CLOSEST OBSTACLE...")
+        self.log.debug("Search cone: {} deg".format(search_cone_degrees))
+        if max_range:
+            self.log.debug("Search range: {} cm".format(max_range))
+        initial_speed = self.speed
+        self.speed = 8
+        initial_theta = self.theta
+        search_cone_half_radians = math.radians(search_cone_degrees / 2)
+        search_max_theta = initial_theta + search_cone_half_radians
+        search_min_theta = initial_theta - search_cone_half_radians
+        self.turn_degrees(search_cone_degrees / 2)
+        min_dis_theta = self.theta
+        min_dis = max_range if max_range else self.ultrasonic_sensor.distance_centimeters
+        self.log.debug("Initial distance: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
+
+        self.turn_forever(clockwise=True)
+        while 0.7 * search_min_theta <= self.theta <= 1.3 * search_max_theta:
+            self.update_odometry()
+            self.log.debug("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(
+                math.degrees(self.theta), math.degrees(search_min_theta))
+            )
+            current_dis = self.ultrasonic_sensor.distance_centimeters
+            current_theta = self.theta
+            self.log.debug("Current obs dis: {:.2f}\n".format(current_dis))
+            if current_dis < min_dis:
+                min_dis = current_dis
+                min_dis_theta = current_theta
+        self.stop()
+        if restore:
+            self.rotate_to_match(initial_theta)
+        else:
+            self.rotate_to_match(min_dis_theta)
+        self.speed = initial_speed
+        self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.theta)))
+
+        if max_range and min_dis_theta == initial_theta:
+            self.log.info("Detected no obstacle within range")
+            return None
+        self.log.info(
+            "Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(min_dis, math.degrees(min_dis_theta))
+        )
+        return min_dis, min_dis_theta
 
     # ****************************************************************
     # Other Sensors & functions

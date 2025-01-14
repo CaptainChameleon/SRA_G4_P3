@@ -15,6 +15,7 @@ class ParkingController(RobotController):
         self.second_obstacle_pos = None
         self.black_ribbon_dir = None
         self.parking_pos = None
+        self.second_obstacle_theta = None
 
     def search_for_first_obstacle(self):
         self.log.info("||> SEARCHING FOR FIRST OBSTACLE")
@@ -22,7 +23,9 @@ class ParkingController(RobotController):
         self.robot.pos = Vector(0, 0)
         self.robot.look_at = Vector(0, 1)
         self.robot.theta = math.pi/2
-        self.first_obstacle_pos = self.robot.get_obstacle_pos()
+        self.first_obstacle_pos = Vector(0, dis_to_first_obs)
+        self.log.info("||> FIRST OBSTACLE AT: {}".format(self.first_obstacle_pos))
+        #self.first_obstacle_pos = self.robot.get_obstacle_pos()
 
     def search_for_second_obstacle(self):
         self.log.info("||> SEARCHING FOR SECOND OBSTACLE")
@@ -50,10 +53,14 @@ class ParkingController(RobotController):
                 self.robot.stop()
                 detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=120, max_range=40)
                 if detected_obstacle:
+                    self.log.info("||> DETECTED SECOND OBSTACLE")
                     dis, detection_theta = detected_obstacle
                     self.robot.rotate_to_match(detection_theta)
-                    self.second_obstacle_pos = self.robot.get_obstacle_pos()
+                    self.second_obstacle_pos = Vector(self.robot.pos.x + dis*math.cos(detection_theta), self.robot.pos.y + dis*math.sin(detection_theta))
+                    self.log.info("||> SECOND OBSTACLE AT: {}".format(self.second_obstacle_pos))
+                    #self.second_obstacle_pos = self.robot.get_obstacle_pos()
                     self.black_ribbon_dir = self.second_obstacle_pos - self.first_obstacle_pos
+                    break
 
     def park_robot(self):
         self.parking_pos = Vector.middle_of(self.second_obstacle_pos, self.first_obstacle_pos)
@@ -64,13 +71,21 @@ class ParkingController(RobotController):
         self.log.info("Robot pos: {}".format(self.robot.pos))
         self.log.info("Looking at: {}".format(self.robot.look_at))
 
-        self.robot.look_towards(self.parking_pos)
-        self.robot.move_straight((self.parking_pos - self.robot.pos).length + self.robot.wheel_base / 2)
-        self.robot.turn_forever()
-        while not self.robot.is_detecting_black():
-            self.robot.update_odometry()
-        self.robot.stop()
-        self.robot.turn_degrees(90)
+        self.second_obstacle_theta = 0
+
+        
+
+        
+
+
+
+        #self.robot.look_towards(self.second_obstacle_pos)
+        #self.robot.move_straight((self.parking_pos - self.robot.pos).length + self.robot.wheel_base / 2)
+        #self.robot.turn_forever()
+        #while not self.robot.is_detecting_black():
+        #    self.robot.update_odometry()
+        #self.robot.stop()
+        #self.robot.turn_degrees(90)
 
         # self.robot.turn_degrees(self.robot.look_at.angle_with(self.black_ribbon_dir, in_degrees=True))
         # robot_to_parking = self.parking_pos - self.robot.pos
@@ -86,6 +101,7 @@ class ParkingController(RobotController):
         #         break
         # #self.robot.turn_degrees(90)
         # self.log.info("||> APARCAO ;^]")
+
 
     def move(self):
         self.search_for_first_obstacle()
