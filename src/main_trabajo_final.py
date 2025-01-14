@@ -15,7 +15,9 @@ class ParkingController(RobotController):
         self.second_obstacle_pos = None
         self.black_ribbon_dir = None
         self.parking_pos = None
+        self.second_obstacle_dis = None
         self.second_obstacle_theta = None
+        self.turned_to_left = True
 
     def search_for_first_obstacle(self):
         self.log.info("||> SEARCHING FOR FIRST OBSTACLE")
@@ -47,6 +49,7 @@ class ParkingController(RobotController):
                 # if not self.robot.is_detecting_obstacle_within(dis_to_first_obs):
                 #     self.robot.look_towards(self.first_obstacle_pos)
                 self.robot.rotate_to_avoid_obstacle(distance_to_first_obs, clockwise=True)
+                self.turned_to_left = False
                 self.robot.run_forever()
             if self.robot.pos.y > self.first_obstacle_pos.y + 10:
                 self.log.info("||> PASSED FIRST OBSTACLE")
@@ -55,6 +58,7 @@ class ParkingController(RobotController):
                 if detected_obstacle:
                     self.log.info("||> DETECTED SECOND OBSTACLE")
                     dis, detection_theta = detected_obstacle
+                    self.second_obstacle_dis = dis
                     self.robot.rotate_to_match(detection_theta)
                     self.second_obstacle_pos = Vector(self.robot.pos.x + dis*math.cos(detection_theta), self.robot.pos.y + dis*math.sin(detection_theta))
                     self.log.info("||> SECOND OBSTACLE AT: {}".format(self.second_obstacle_pos))
@@ -71,9 +75,16 @@ class ParkingController(RobotController):
         self.log.info("Robot pos: {}".format(self.robot.pos))
         self.log.info("Looking at: {}".format(self.robot.look_at))
 
-        self.second_obstacle_theta = 0
-
-        
+        second_obstacle_theta = 0
+        self.robot.theta = 0
+        self.robot.scan_until_not_detected(self.second_obstacle_dis, clockwise=self.turned_to_left, restore=False)
+        first_obstacle_dis, first_obstacle_theta = self.robot.scan_for_second_closest_obstacle(clockwise=self.turned_to_left, search_cone_degrees=180)
+        parking_theta = first_obstacle_theta / 2
+        self.robot.rotate_to_match(parking_theta)
+        self.robot.run_forever()
+        while not self.robot.is_detecting_black():
+            self.robot.update_odometry()
+        self.robot.stop()
 
         
 
