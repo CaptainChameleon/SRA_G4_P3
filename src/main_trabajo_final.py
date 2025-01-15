@@ -59,6 +59,7 @@ class ParkingController(RobotController):
                     self.log.info("||> DETECTED SECOND OBSTACLE")
                     dis, detection_theta = detected_obstacle
                     self.second_obstacle_dis = dis
+                    self.second_obstacle_theta = detection_theta
                     self.robot.rotate_to_match(detection_theta)
                     self.second_obstacle_pos = Vector(self.robot.pos.x + dis*math.cos(detection_theta), self.robot.pos.y + dis*math.sin(detection_theta))
                     self.log.info("||> SECOND OBSTACLE AT: {}".format(self.second_obstacle_pos))
@@ -75,12 +76,15 @@ class ParkingController(RobotController):
         self.log.info("Robot pos: {}".format(self.robot.pos))
         self.log.info("Looking at: {}".format(self.robot.look_at))
 
-        second_obstacle_theta = 0
-        self.robot.theta = 0
         self.robot.scan_until_not_detected(self.second_obstacle_dis, clockwise=self.turned_to_left, restore=False)
         first_obstacle_dis, first_obstacle_theta = self.robot.scan_for_second_closest_obstacle(clockwise=self.turned_to_left, search_cone_degrees=180)
-        parking_theta = first_obstacle_theta / 2
+        self.log.info("First obstacle dis: {}".format(first_obstacle_dis))
+        self.log.info("First obstacle theta: {}".format(first_obstacle_theta))
+        parking_theta = (first_obstacle_theta - self.second_obstacle_theta) / 2
+
+        parking_theta = first_obstacle_theta + math.pi/ 2 if self.turned_to_left else first_obstacle_theta - math.pi/2
         self.robot.rotate_to_match(parking_theta)
+
         self.robot.run_forever()
         while not self.robot.is_detecting_black():
             self.robot.update_odometry()
@@ -121,6 +125,6 @@ class ParkingController(RobotController):
 
 
 if __name__ == '__main__':
-    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.INFO)
+    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.DEBUG)
     robot_controller.robot.speed = 10
     robot_controller.run()
