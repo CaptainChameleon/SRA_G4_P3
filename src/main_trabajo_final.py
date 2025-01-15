@@ -51,7 +51,7 @@ class ParkingController(RobotController):
                 self.robot.rotate_to_avoid_obstacle(distance_to_first_obs, clockwise=True)
                 self.turned_to_left = False
                 self.robot.run_forever()
-            if self.robot.pos.y > self.first_obstacle_pos.y + 10:
+            if self.robot.pos.y > (self.first_obstacle_pos.y + 10 if self.turned_to_left else self.first_obstacle_pos.y + 5):
                 self.log.info("||> PASSED FIRST OBSTACLE")
                 self.robot.stop()
                 detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=120, max_range=40)
@@ -80,23 +80,25 @@ class ParkingController(RobotController):
         first_obstacle_dis, first_obstacle_theta = self.robot.scan_for_second_closest_obstacle(clockwise=self.turned_to_left, search_cone_degrees=180)
         #parking_theta = (first_obstacle_theta - self.second_obstacle_theta) / 2
 
-        theta_diff = abs(self.second_obstacle_theta - first_obstacle_theta)
-        if theta_diff <= math.pi:
-            parking_theta = (self.second_obstacle_theta + first_obstacle_theta) / 2
+        if self.turned_to_left:
+            theta_diff = abs(self.second_obstacle_theta - first_obstacle_theta)
+            if theta_diff <= math.pi:
+                parking_theta = (self.second_obstacle_theta + first_obstacle_theta) / 2
+            else:
+                lower_theta = min(self.second_obstacle_theta, first_obstacle_theta)
+                bigger_theta = max(self.second_obstacle_theta, first_obstacle_theta)
+                lower_theta += 2*math.pi
+                parking_theta = (lower_theta + bigger_theta)/2 - 2*math.pi
         else:
-            lower_theta = min(self.second_obstacle_theta, first_obstacle_theta)
-            bigger_theta = max(self.second_obstacle_theta, first_obstacle_theta)
-            lower_theta += 2*math.pi
-            parking_theta = (lower_theta + bigger_theta)/2 - 2*math.pi
+            parking_theta = (self.second_obstacle_theta + first_obstacle_theta) / 2
 
         self.log.info("First obstacle dis: {}".format(first_obstacle_dis))
         self.log.info("First obstacle theta: {}".format(first_obstacle_theta))
-        self.log.info("First obstacle theta: {}".format(self.second_obstacle_theta))
+        self.log.info("Second obstacle theta: {}".format(self.second_obstacle_theta))
         self.log.info("Parking theta: {}".format(parking_theta))
         self.log.info("Current theta: {}".format(self.robot.theta))
 
         self.robot.rotate_to_match(parking_theta)
-        return
 
         self.robot.run_forever()
         while not self.robot.is_detecting_black():

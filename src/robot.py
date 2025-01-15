@@ -184,6 +184,12 @@ class Robot:
     def rotate_to_match(self, new_theta):
         self.log.info("||> ROTATING TO MATCH: {:.4f} rad from {} rad".format(new_theta, self.theta))
         self.turn_degrees(math.degrees(new_theta - self.theta))
+        """delta_theta = (new_theta - self.theta) % (2 * math.pi)
+        if delta_theta > math.pi:  # Si la diferencia es mayor a 180°, ajustamos
+            delta_theta -= 2 * math.pi
+        
+        self.log.info("||> ROTATING TO MATCH: {:.4f} rad from {:.4f} rad".format(new_theta, self.theta))
+        self.turn_degrees(math.degrees(delta_theta))"""
 
     def store_position(self):
         self.stored_theta = self.theta
@@ -238,7 +244,7 @@ class Robot:
             self.update_odometry()
         self.stop()
 
-    def rotate_to_avoid_obstacle(self, obstacle_dis, clockwise: bool, safety_theta: float = 10):
+    def rotate_to_avoid_obstacle(self, obstacle_dis, clockwise: bool, safety_theta: float = 15):
         self.log.info("||> ROTATING TO AVOID OBSTACLE...")
         # self.scan_until_not_detected(obstacle_dis, clockwise, restore=False)
         left_wheel_pos = self.look_at.rotate_degrees(90).to_length(self.wheel_base / 2)
