@@ -78,12 +78,14 @@ class ParkingController(RobotController):
 
         self.robot.scan_until_not_detected(self.second_obstacle_dis, clockwise=self.turned_to_left, restore=False)
         first_obstacle_dis, first_obstacle_theta = self.robot.scan_for_second_closest_obstacle(clockwise=self.turned_to_left, search_cone_degrees=180)
+        parking_theta = (first_obstacle_theta - self.second_obstacle_theta) / 2
         self.log.info("First obstacle dis: {}".format(first_obstacle_dis))
         self.log.info("First obstacle theta: {}".format(first_obstacle_theta))
-        parking_theta = (first_obstacle_theta - self.second_obstacle_theta) / 2
+        self.log.info("Parking theta: {}".format(parking_theta))
+        self.log.info("Current theta: {}".format(self.robot.theta))
 
-        parking_theta = first_obstacle_theta + math.pi/ 2 if self.turned_to_left else first_obstacle_theta - math.pi/2
-        self.robot.rotate_to_match(parking_theta)
+        # self.robot.rotate_to_match(parking_theta)
+        return
 
         self.robot.run_forever()
         while not self.robot.is_detecting_black():
@@ -125,6 +127,6 @@ class ParkingController(RobotController):
 
 
 if __name__ == '__main__':
-    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.DEBUG)
+    robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.INFO)
     robot_controller.robot.speed = 10
     robot_controller.run()

@@ -308,34 +308,27 @@ class Robot:
         self.log.debug("Search cone: {} deg".format(search_cone_degrees))
         initial_speed = self.speed
         self.speed = 8
-        #initial_theta = self.theta
         search_cone_radians = math.radians(search_cone_degrees)
-        #search_max_theta = initial_theta  + (2*math.pi) - search_cone_radians if clockwise else initial_theta + search_cone_radians
-        #search_max_theta = 
         
-        #min_dis_theta = self.theta
+        min_dis_theta = self.theta
         min_dis = self.ultrasonic_sensor.distance_centimeters
-        self.log.debug("Initial distance: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
-        self.turn_forever(clockwise=clockwise)
+        self.log.info("Initial params: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
 
-        while self.theta >= 1.3 * search_cone_radians:
+        self.turn_forever(clockwise=clockwise)
+        while 0 <= abs(self.theta - search_cone_radians) <= 0.3:
             self.update_odometry()
-            self.log.debug("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(
-                math.degrees(self.theta), math.degrees(search_cone_radians))
-            )
+            self.log.info("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(self.theta, search_cone_radians))
             current_dis = self.ultrasonic_sensor.distance_centimeters
             current_theta = self.theta
-            self.log.debug("Current obs dis: {:.2f}\n".format(current_dis))
+            self.log.info("Current obs dis: {:.2f}\n".format(current_dis))
             if current_dis < min_dis:
                 min_dis = current_dis
                 min_dis_theta = current_theta
         self.stop()
         self.rotate_to_match(min_dis_theta)
         self.speed = initial_speed
-        self.log.debug("Robot angle: {:.2f} deg".format(math.degrees(self.theta)))
-        self.log.info(
-            "Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(min_dis, math.degrees(min_dis_theta))
-        )
+        self.log.debug("Robot angle: {:.2f} deg".format(self.theta))
+        self.log.info("Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(min_dis, min_dis_theta))
         return min_dis, min_dis_theta
 
     # ****************************************************************
