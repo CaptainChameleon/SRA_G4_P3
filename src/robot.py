@@ -315,7 +315,7 @@ class Robot:
         self.log.info("Initial params: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
 
         self.turn_forever(clockwise=clockwise)
-        while 0 <= abs(self.theta - search_cone_radians) <= 0.3:
+        while 0.3 <= abs(self.theta - search_cone_radians) :
             self.update_odometry()
             self.log.info("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(self.theta, search_cone_radians))
             current_dis = self.ultrasonic_sensor.distance_centimeters
