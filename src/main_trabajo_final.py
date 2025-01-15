@@ -68,6 +68,9 @@ class ParkingController(RobotController):
                     break
 
     def park_robot(self):
+
+        self.robot.theta = 0
+        self.second_obstacle_theta = 0
         self.parking_pos = Vector.middle_of(self.second_obstacle_pos, self.first_obstacle_pos)
         self.log.info("||> PARKING AT: {}".format(self.parking_pos))
         self.log.info("First obs: {}".format(self.first_obstacle_pos))
@@ -104,6 +107,11 @@ class ParkingController(RobotController):
         while not self.robot.is_detecting_black():
             self.robot.update_odometry()
         self.robot.stop()
+
+
+        self.robot.move_straight(-5.5)
+        self.robot.scan_for_second_closest_obstacle(clockwise=False, search_cone_degrees=270)
+
 
         
 

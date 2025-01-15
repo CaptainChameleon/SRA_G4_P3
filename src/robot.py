@@ -182,14 +182,14 @@ class Robot:
         self.turn_degrees(point.angle_with(self.look_at, in_degrees=True))
 
     def rotate_to_match(self, new_theta):
-        self.log.info("||> ROTATING TO MATCH: {:.4f} rad from {} rad".format(new_theta, self.theta))
-        self.turn_degrees(math.degrees(new_theta - self.theta))
-        """delta_theta = (new_theta - self.theta) % (2 * math.pi)
+        # self.log.info("||> ROTATING TO MATCH: {:.4f} rad from {} rad".format(new_theta, self.theta))
+        # self.turn_degrees(math.degrees(new_theta - self.theta))
+        delta_theta = (new_theta - self.theta) % (2 * math.pi)
         if delta_theta > math.pi:  # Si la diferencia es mayor a 180°, ajustamos
             delta_theta -= 2 * math.pi
         
         self.log.info("||> ROTATING TO MATCH: {:.4f} rad from {:.4f} rad".format(new_theta, self.theta))
-        self.turn_degrees(math.degrees(delta_theta))"""
+        self.turn_degrees(math.degrees(delta_theta))
 
     def store_position(self):
         self.stored_theta = self.theta
