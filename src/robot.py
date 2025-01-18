@@ -57,13 +57,7 @@ class Robot:
 
     @staticmethod
     def normalize_theta(theta) -> float:
-        if theta < 0:
-            normalized_theta = 2 * math.pi + theta
-        else:
-            normalized_theta = theta
-        if normalized_theta > 2 * math.pi:
-            normalized_theta = normalized_theta % (2 * math.pi)
-        return normalized_theta
+        return theta % (2 * math.pi)
 
     def tachos_to_distance(self, tachos: int) -> float:
         return (tachos / 360) * math.pi * self.wheel_diameter
