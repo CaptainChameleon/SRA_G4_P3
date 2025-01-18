@@ -10,6 +10,7 @@ from typing import Tuple
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedPercent
 from ev3dev2.sensor.lego import UltrasonicSensor
+from ev3dev2.led import Leds
 from ev3dev2.sound import Sound
 from ev3dev2.sensor.lego import ColorSensor
 from ev3dev2.sensor import INPUT_3
@@ -54,6 +55,16 @@ class Robot:
     # Positional System
     # ****************************************************************
 
+    @staticmethod
+    def normalize_theta(theta) -> float:
+        if theta < 0:
+            normalized_theta = 2 * math.pi + theta
+        else:
+            normalized_theta = theta
+        if normalized_theta > 2 * math.pi:
+            normalized_theta = normalized_theta % (2 * math.pi)
+        return normalized_theta
+
     def tachos_to_distance(self, tachos: int) -> float:
         return (tachos / 360) * math.pi * self.wheel_diameter
 
@@ -72,7 +83,7 @@ class Robot:
         self.left_motor_dis = 0
         self.right_motor_dis = 0
         self.log.debug("Motor L pos after reset: {}".format(self.left_motor.position))
-        self.log.debug("Motor R pos after reset: {}".format(self.right_motor.position))
+        self.log.debug("Motor R pos after reset: {}\n".format(self.right_motor.position))
 
     def update_odometry(self):
         self.log.debug("Updating odometry")
@@ -87,8 +98,7 @@ class Robot:
 
         d_center = (d_left + d_right) / 2
         delta_theta = (d_right - d_left) / self.wheel_base
-        self.theta += delta_theta
-        self.theta %= (2 * math.pi)  # Keep theta within [0, 2*pi]
+        self.theta = self.normalize_theta(self.theta + delta_theta)
 
         # Update position
         self.pos.x += d_center * math.cos(self.theta)
@@ -101,7 +111,7 @@ class Robot:
         # Log updated values
         self.log.debug("Updated Position: {}".format(self.pos))
         self.log.debug("Updated Orientation: {:.4f} radians".format(self.theta))
-        self.log.debug("Look-at Vector: {}".format(self.look_at))
+        self.log.debug("Look-at Vector: {}\n".format(self.look_at))
 
     @property
     def speed(self):
@@ -114,9 +124,9 @@ class Robot:
         self.base_right_speed = new_speed * 0.9976309566323637
 
     def move_straight(self, distance: float):
-        self.log.info("\n||> MOVING {} {:.4f} cm".format("FORWARD" if distance > 0 else "BACKWARD", distance))
+        self.log.info("||> MOVING {} {:.4f} cm".format("FORWARD" if distance > 0 else "BACKWARD", distance))
         degrees_to_turn = self.distance_to_tachos(distance)
-        self.log.info("Target Tachos: {:.4f}".format(degrees_to_turn))
+        self.log.debug("Target Tachos: {:.4f}\n".format(degrees_to_turn))
         self.left_motor.on_for_degrees(degrees=degrees_to_turn, speed=SpeedPercent(self.base_left_speed), brake=True,
                                        block=False)
         self.right_motor.on_for_degrees(degrees=degrees_to_turn, speed=SpeedPercent(self.base_right_speed), brake=True,
@@ -125,9 +135,9 @@ class Robot:
         self.reset_motors()
 
     def turn_degrees(self, degrees: float):
-        self.log.info("\n||> ROTATING {:.4f} deg...".format(degrees))
+        self.log.info("||> ROTATING {:.4f} deg...".format(degrees))
         wheel_degrees = self.rotation_to_wheel_degrees(degrees)
-        self.log.debug("Target Tachos: {:.4f}".format(wheel_degrees))
+        self.log.debug("Target Tachos: {:.4f}\n".format(wheel_degrees))
         self.left_motor.on_for_degrees(degrees=-wheel_degrees, speed=SpeedPercent(self.base_left_speed), brake=True,
                                        block=False)
         self.right_motor.on_for_degrees(degrees=wheel_degrees, speed=SpeedPercent(self.base_right_speed), brake=True,
@@ -136,7 +146,7 @@ class Robot:
         self.reset_motors()
 
     def run_forever(self):
-        self.log.info("\n||> MOVING IN A STRAIGHT LINE...")
+        self.log.info("||> MOVING IN A STRAIGHT LINE...\n")
         self.left_motor.speed_sp = int(self.base_left_speed / 100 * self.left_motor.max_speed)
         self.right_motor.speed_sp = int(self.base_right_speed / 100 * self.right_motor.max_speed)
         self.left_motor.run_forever()
@@ -144,7 +154,7 @@ class Robot:
 
     def turn_forever(self, center_of_rotation: Vector = None, clockwise: bool = False):
         self.log.info(
-            "\n||> ROTATING {}...".format("AROUND {}".format(center_of_rotation) if center_of_rotation else "IN PLACE")
+            "||> ROTATING {}...\n".format("AROUND {}".format(center_of_rotation) if center_of_rotation else "IN PLACE")
         )
         if center_of_rotation:
             distance_to_center = (center_of_rotation - self.pos).length
@@ -219,7 +229,7 @@ class Robot:
 
         # Scan until obstacle is no longer detected
         self.turn_forever(clockwise=clockwise)
-        while current_dis <= initial_obstacle_distance * 1.1:
+        while current_dis <= initial_obstacle_distance * 1.2:
             self.update_odometry()
             current_dis = self.ultrasonic_sensor.distance_centimeters
             self.log.info(
@@ -249,15 +259,15 @@ class Robot:
         # self.scan_until_not_detected(obstacle_dis, clockwise, restore=False)
         left_wheel_pos = self.look_at.rotate_degrees(90).to_length(self.wheel_base / 2)
         right_wheel_pos = self.look_at.rotate_degrees(-90).to_length(self.wheel_base / 2)
-        left_wheel_ray = left_wheel_pos + self.look_at.to_length(self.ultrasonic_sensor.distance_centimeters)
-        right_wheel_ray = right_wheel_pos + self.look_at.to_length(self.ultrasonic_sensor.distance_centimeters)
+        left_wheel_ray = left_wheel_pos + self.look_at.to_length(obstacle_dis)
+        right_wheel_ray = right_wheel_pos + self.look_at.to_length(obstacle_dis)
         if clockwise:
             self.turn_degrees(left_wheel_ray.angle_with(right_wheel_ray, in_degrees=True) - safety_theta)
         else:
             self.turn_degrees(right_wheel_ray.angle_with(left_wheel_ray, in_degrees=True) + safety_theta)
 
-    def scan_for_closest_obstacle(self, search_cone_degrees: float = 120, max_range: float = None, restore: bool = True) -> None or Tuple[float, float]:
-        self.log.info("\n||> SEARCHING FOR CLOSEST OBSTACLE...")
+    def scan_for_closest_obstacle(self, search_cone_degrees: float = 120, max_range: float = None, restore: bool = False) -> None or Tuple[float, float]:
+        self.log.info("||> SEARCHING FOR CLOSEST OBSTACLE...")
         self.log.debug("Search cone: {} deg".format(search_cone_degrees))
         if max_range:
             self.log.debug("Search range: {} cm".format(max_range))
@@ -265,8 +275,8 @@ class Robot:
         self.speed = 8
         initial_theta = self.theta
         search_cone_half_radians = math.radians(search_cone_degrees / 2)
-        search_max_theta = initial_theta + search_cone_half_radians
-        search_min_theta = initial_theta - search_cone_half_radians
+        search_max_theta = self.normalize_theta(initial_theta + search_cone_half_radians)
+        search_min_theta = self.normalize_theta(initial_theta - search_cone_half_radians)
         self.turn_degrees(search_cone_degrees / 2)
         min_dis_theta = self.theta
         min_dis = max_range if max_range else self.ultrasonic_sensor.distance_centimeters
@@ -275,7 +285,7 @@ class Robot:
         self.turn_forever(clockwise=True)
         while 0.7 * search_min_theta <= self.theta <= 1.3 * search_max_theta:
             self.update_odometry()
-            self.log.debug("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(
+            self.log.info("Current theta: {:.4f}  Target theta {:.4f}".format(
                 math.degrees(self.theta), math.degrees(search_min_theta))
             )
             current_dis = self.ultrasonic_sensor.distance_centimeters
@@ -296,34 +306,26 @@ class Robot:
             self.log.info("Detected no obstacle within range")
             return None
         self.log.info(
-            "Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(min_dis, math.degrees(min_dis_theta))
+            "Detected closest obstacle at {:.2f} cm and {:.4f} deg\n".format(min_dis, math.degrees(min_dis_theta))
         )
         return min_dis, min_dis_theta
 
-    def get_obstacle_pos(self) -> Vector:
-        obstacle_dis = self.ultrasonic_sensor.distance_centimeters
-        left_theta_limit = self.scan_until_not_detected(obstacle_dis, clockwise=False)
-        right_theta_limit = self.scan_until_not_detected(obstacle_dis, clockwise=True)
-        beta = left_theta_limit - (left_theta_limit - right_theta_limit) / 2
-        obstacle_pos = self.pos + Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
-        self.log.info("Found obstacle at {}".format(obstacle_pos))
-        return obstacle_pos
-
-    def scan_for_second_closest_obstacle(self, clockwise: bool, search_cone_degrees: float = 120) -> Tuple[float, float]:
-        self.log.info("\n||> SEARCHING FOR SECOND CLOSEST OBSTACLE...")
+    def scan_side_for_closest_obstacle(self, clockwise: bool, search_cone_degrees: float = 120) -> Tuple[float, float]:
+        self.log.info("||> SEARCHING FOR CLOSEST OBSTACLE TO THE {}...".format("RIGHT" if clockwise else "LEFT"))
         self.log.debug("Search cone: {} deg".format(search_cone_degrees))
         initial_speed = self.speed
         self.speed = 8
-        search_cone_radians = math.radians(search_cone_degrees)
+        target_theta = self.theta - math.radians(search_cone_degrees) if clockwise else self.theta + math.radians(search_cone_degrees)
+        target_theta = self.normalize_theta(target_theta)
         
-        min_dis_theta = self.theta
         min_dis = self.ultrasonic_sensor.distance_centimeters
+        min_dis_theta = self.theta
         self.log.info("Initial params: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
 
         self.turn_forever(clockwise=clockwise)
-        while 0.3 <= abs(self.theta - search_cone_radians):
+        while 0.3 <= abs(self.theta - target_theta):
             self.update_odometry()
-            self.log.info("\nCurrent theta: {:.4f}  Target theta {:.4f}".format(self.theta, search_cone_radians))
+            self.log.info("Current theta: {:.4f}  Target theta {:.4f}\n".format(self.theta, target_theta))
             current_dis = self.ultrasonic_sensor.distance_centimeters
             current_theta = self.theta
             self.log.info("Current obs dis: {:.2f}\n".format(current_dis))
@@ -334,8 +336,17 @@ class Robot:
         self.rotate_to_match(min_dis_theta)
         self.speed = initial_speed
         self.log.debug("Robot angle: {:.2f} deg".format(self.theta))
-        self.log.info("Detected closest obstacle at {:.2f} cm and {:.4f} deg ".format(min_dis, min_dis_theta))
+        self.log.info("Detected closest obstacle at {:.2f} cm and {:.4f} deg\n".format(min_dis, min_dis_theta))
         return min_dis, min_dis_theta
+
+    def get_obstacle_pos(self) -> Vector:
+        obstacle_dis = self.ultrasonic_sensor.distance_centimeters
+        left_theta_limit = self.scan_until_not_detected(obstacle_dis, clockwise=False)
+        right_theta_limit = self.scan_until_not_detected(obstacle_dis, clockwise=True)
+        beta = left_theta_limit - (left_theta_limit - right_theta_limit) / 2
+        obstacle_pos = self.pos + Vector(obstacle_dis * math.cos(beta), obstacle_dis * math.sin(beta))
+        self.log.info("Found obstacle at {}".format(obstacle_pos))
+        return obstacle_pos
 
     # ****************************************************************
     # Other Sensors & functions
@@ -376,6 +387,12 @@ class RobotController(abc.ABC):
         pass
 
     def run(self):
+        leds = Leds()
+        leds.animate_rainbow()
+        leds.set_color("LEFT", "ORANGE")
+        leds.set_color("RIGHT", "ORANGE")
         # self.robot.beep(2)
         self.move()
         # self.robot.beep(3)
+        leds.set_color("LEFT", "GREEN")
+        leds.set_color("RIGHT", "GREEN")
