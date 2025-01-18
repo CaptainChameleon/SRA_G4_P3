@@ -20,7 +20,7 @@ class ParkingController(RobotController):
     def search_for_first_obstacle(self):
         self.log.info("||> SEARCHING FOR FIRST OBSTACLE")
         dis_to_first_obs, _ = self.robot.scan_for_closest_obstacle(search_cone_degrees=160)
-        security_dis = 20
+        security_dis = 25
         self.robot.move_straight(dis_to_first_obs - security_dis)
         self.robot.rotate_to_avoid_obstacle(security_dis, clockwise=True)
         self.robot.scan_side_for_closest_obstacle(clockwise=False, search_cone_degrees=90)
