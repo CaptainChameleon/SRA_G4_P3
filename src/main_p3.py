@@ -56,14 +56,14 @@ class SquareTestController(RobotController):
         # C) Determinar si existe error sistemático.
         # D) Forzar la aparición de error sistemático y comprobar si el test aplica las correcciones adecuadas.
         # E) Construir una plataforma diferencial con una geometría diferente y comparar y justificar los resultados.
-        # self.make_square(clockwise=True)
+        self.make_square(clockwise=True)
 
         # F) Caracterización del error de otros sensores: ultrasonidos, orientación
-        times = 0
-        while times < 10:
-            self.ultrasonic_test(stop_distance=10, times=times)
-            self.wait(duration=20)
-            times += 1
+        #times = 0
+        #while times < 10:
+        #    self.ultrasonic_test(stop_distance=10, times=times)
+        #    self.wait(duration=20)
+        #    times += 1
         # self.gyroscope_test(degrees=90)
 
 

@@ -277,7 +277,10 @@ class Robot:
         self.log.debug("Initial distance: {:.4f} {:.4f}".format(min_dis, min_dis_theta))
 
         self.turn_forever(clockwise=True)
+
+        self.log.info("Initial theta: {:.4f} {:.4f}".format(search_min_theta, search_max_theta))
         while 0.7 * search_min_theta <= self.theta <= 1.3 * search_max_theta:
+            self.log.info("Theta into while: {:.4f} {:.4f}".format(search_min_theta, search_max_theta))
             self.update_odometry()
             self.log.info("Current theta: {:.4f}  Target theta {:.4f}".format(
                 math.degrees(self.theta), math.degrees(search_min_theta))
@@ -385,8 +388,8 @@ class RobotController(abc.ABC):
         leds.animate_rainbow()
         leds.set_color("LEFT", "ORANGE")
         leds.set_color("RIGHT", "ORANGE")
-        # self.robot.beep(2)
+        self.robot.beep(2)
         self.move()
-        # self.robot.beep(3)
+        self.robot.beep(3)
         leds.set_color("LEFT", "GREEN")
         leds.set_color("RIGHT", "GREEN")
