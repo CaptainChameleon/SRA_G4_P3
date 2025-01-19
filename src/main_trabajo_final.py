@@ -48,10 +48,15 @@ class ParkingController(RobotController):
                 self.robot.rotate_to_avoid_obstacle(distance_to_first_obs, clockwise=True, safety_theta=10)
                 self.turned_to_left = False
                 self.robot.run_forever()
-            if self.robot.pos.y > ((self.first_obstacle_pos.y + self.robot.wheel_base/3) if self.turned_to_left else (self.first_obstacle_pos.y + self.robot.wheel_base/2)):
+            if self.robot.pos.y > ((self.first_obstacle_pos.y + self.robot.wheel_base/2) if self.turned_to_left else (self.first_obstacle_pos.y + self.robot.wheel_base/2)):
                 self.log.info("||> PASSED FIRST OBSTACLE")
                 self.robot.stop()
-                detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=145, max_range=40)
+
+                if self.turned_to_left:
+                    detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=170, max_range=40)
+                else:
+                    detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=145, max_range=40)
+                
                 if detected_obstacle:
                     self.log.info("||> DETECTED SECOND OBSTACLE")
                     dis, detection_theta = detected_obstacle
