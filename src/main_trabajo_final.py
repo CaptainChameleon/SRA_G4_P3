@@ -51,7 +51,7 @@ class ParkingController(RobotController):
             if self.robot.pos.y > ((self.first_obstacle_pos.y + self.robot.wheel_base/2) if self.turned_to_left else (self.first_obstacle_pos.y + self.robot.wheel_base/2)):
                 self.log.info("||> PASSED FIRST OBSTACLE")
                 self.robot.stop()
-                detected_obstacle = self.robot.scan_for_closest_obstacle(max_range=40, search_cone_degrees=145, both_sides=True)
+                detected_obstacle = self.robot.scan_for_closest_obstacle(search_cone_degrees=145, both_sides=True)
                 if detected_obstacle:
                     self.log.info("||> DETECTED SECOND OBSTACLE")
                     dis, detection_theta = detected_obstacle
@@ -65,6 +65,7 @@ class ParkingController(RobotController):
     def park_robot(self):
         security_dis = 20
         self.robot.move_straight(self.second_obstacle_dis - security_dis)
+        self.robot.scan_for_closest_obstacle(both_sides=True)
         self.robot.theta = 0
         self.second_obstacle_theta = 0
         self.robot.rotate_to_avoid_obstacle(self.second_obstacle_dis, clockwise=self.turned_to_left, safety_theta=5)
@@ -83,6 +84,7 @@ class ParkingController(RobotController):
                 parking_theta = (lower_theta + bigger_theta)/2 - 2*math.pi
         else:
             parking_theta = (self.second_obstacle_theta + first_obstacle_theta) / 2
+        parking_theta = self.robot.normalize_theta(parking_theta)
 
         self.log.info("First obstacle dis: {}".format(first_obstacle_dis))
         self.log.info("First obstacle theta: {}".format(first_obstacle_theta))
@@ -96,7 +98,7 @@ class ParkingController(RobotController):
         while not self.robot.is_detecting_black():
             self.robot.update_odometry()
         self.robot.stop()
-        self.robot.move_straight(-1.5)
+        # self.robot.move_straight(-1.5)
         self.robot.scan_for_closest_obstacle(clockwise=False, search_cone_degrees=270)
 
     def move(self):
@@ -107,5 +109,5 @@ class ParkingController(RobotController):
 
 if __name__ == '__main__':
     robot_controller = ParkingController(log_name="sra_grupo4_trabajo_final", log_level=logging.INFO)
-    robot_controller.robot.speed = 10
+    robot_controller.robot.speed = 15
     robot_controller.run()
