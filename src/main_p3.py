@@ -15,7 +15,7 @@ class SquareTestController(RobotController):
         degrees = -90 if clockwise else 90
         for _ in range(4):
             self.robot.move_straight(side_len)
-            self.robot.turn_degrees(degrees)
+            self.robot.rotate_degrees(degrees)
 
     def bidirectional_square_test(self, square_size=50, wait_time=10):
         self.make_square(side_len=square_size)
