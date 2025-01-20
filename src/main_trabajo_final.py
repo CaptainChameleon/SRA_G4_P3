@@ -86,6 +86,7 @@ class ParkingController(RobotController):
         else:
             self.log.info("Entro aqui 3")
             parking_theta = (self.second_obstacle_theta + first_obstacle_theta) / 2
+        parking_theta = self.robot.normalize_theta(parking_theta)
 
         self.log.info("First obstacle dis: {}".format(first_obstacle_dis))
         self.log.info("First obstacle theta: {}".format(first_obstacle_theta))
