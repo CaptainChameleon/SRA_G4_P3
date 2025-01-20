@@ -274,7 +274,10 @@ class Robot:
         initial_theta = self.theta
         self.speed = scan_speed
         search_cone_radians = math.radians(search_cone_degrees)
-        target_theta = initial_theta - search_cone_radians if clockwise else initial_theta + search_cone_radians
+        if both_sides:
+            target_theta = initial_theta - search_cone_radians/2 if clockwise else initial_theta + search_cone_radians/2
+        else:
+            target_theta = initial_theta - search_cone_radians if clockwise else initial_theta + search_cone_radians
         target_theta = self.normalize_theta(target_theta)
         
         min_dis = max_range if max_range else self.ultrasonic_sensor.distance_centimeters
