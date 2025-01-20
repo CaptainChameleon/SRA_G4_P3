@@ -287,7 +287,7 @@ class Robot:
             )
             current_dis = self.ultrasonic_sensor.distance_centimeters
             current_theta = self.theta
-            self.log.debug("Current obs dis: {:.2f}\n".format(current_dis))
+            self.log.info("Current obs dis: {:.2f}\n".format(current_dis))
             if current_dis < min_dis:
                 min_dis = current_dis
                 min_dis_theta = current_theta
