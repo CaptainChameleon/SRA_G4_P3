@@ -63,9 +63,9 @@ class ParkingController(RobotController):
                     break
 
     def park_robot(self):
-
         security_dis = 20
         self.robot.move_straight(self.second_obstacle_dis - security_dis)
+        self.robot.scan_for_closest_obstacle()
         self.robot.theta = 0
         self.second_obstacle_theta = 0
         # self.robot.scan_until_not_detected(self.second_obstacle_dis, clockwise=self.turned_to_left, restore=False)
