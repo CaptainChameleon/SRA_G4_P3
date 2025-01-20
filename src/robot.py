@@ -261,7 +261,7 @@ class Robot:
         else:
             self.rotate_degrees(right_wheel_ray.angle_with(left_wheel_ray, in_degrees=True) + safety_theta)
 
-    def scan_for_closest_obstacle(self, clockwise: bool,
+    def scan_for_closest_obstacle(self, clockwise: bool = True,
                                   max_range: float = None, search_cone_degrees: float = 120,
                                   both_sides: bool = False, restore: bool = False,
                                   scan_speed: float = 8, cone_tolerance: float = 0.3) -> None or Tuple[float, float]:
@@ -290,10 +290,10 @@ class Robot:
         self.rotate_forever(clockwise=clockwise)
         while cone_tolerance <= abs(self.theta - target_theta):
             self.update_odometry()
-            self.log.debug("Current theta: {:.4f}  Target theta {:.4f}\n".format(self.theta, target_theta))
+            self.log.info("Current theta: {:.4f}  Target theta {:.4f}\n".format(self.theta, target_theta))
             current_dis = self.ultrasonic_sensor.distance_centimeters
             current_theta = self.theta
-            self.log.debug("Current obs dis: {:.2f}\n".format(current_dis))
+            self.log.info("Current obs dis: {:.2f}\n".format(current_dis))
             if current_dis < min_dis:
                 min_dis = current_dis
                 min_dis_theta = current_theta
